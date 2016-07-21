@@ -289,6 +289,32 @@ _gaq.push(['_trackPageview']);
 	var s = document.getElementsByTagName('script')[0]; 
 	s.parentNode.insertBefore(ga, s);
 })();
+
+/**
+ * Fix issue with cart link button in header not updating when AJAX add to cart button pressed
+ * We need three functions, add to cart button is pressed, remove from cart button pressed
+ * and when a page is refreshed we need to add back in the ui-button ui-widget etc classes
+ */
+
+jQuery( function( $ ) {
+	
+	// When AJAX add to cart event is called 
+	$( document.body ).on( "added_to_cart", function( event, fragments, cart_hash, thisbutton ) {
+		//$( '#button-cart').html(fragments['a.cart-contents']);
+		initButtons();
+	});
+	
+	// When page is refreshed add the classes back in for the cart button
+	$( document ).ready(function() {
+		initButtons();
+	});
+	
+	// When an item is removed from the cart then add the button classes back in
+	$( document.body ).on( "wc_fragments_refreshed", function( event ) {
+		initButtons();
+	});
+});
+
 </script>
 </head>
 
