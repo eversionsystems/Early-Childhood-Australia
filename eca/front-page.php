@@ -12,9 +12,16 @@ get_header();
 
 <div id="eca-front-page" class="content">
 	<div id="eca-front-page-panel">
+	<?php 
+	include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+	if(is_plugin_active('revslider/revslider.php')) {
+	?>
 		<div id="slider">
 			<?php putRevSlider("home") ?>
 		</div><!-- #slider -->
+	<?php 
+	}
+	?>
 		<div id="botm">
 			<div id="botm-title">
 				<span class="title">Book of the<br />month</span>
