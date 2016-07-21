@@ -50,55 +50,6 @@ function eca_setup() {
 add_action( 'after_setup_theme', 'eca_setup' );
 
 
-/**
- * Register widget areas.
- *
- * @since ECA 1.0
- *
- * @return void
- */
-function eca_widgets_init() {
-	/*
-	register_sidebar( array(
-		'name'          => __( 'Primary Sidebar', 'eca' ),
-		'id'            => 'sidebar-1',
-		'description'   => __( 'Main sidebar that appears on the left.', 'eca' ),
-		'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-		'after_widget'  => '</aside>',
-		'before_title'  => '<h1 class="widget-title">',
-		'after_title'   => '</h1>',
-	) );
-	register_sidebar( array(
-		'name'          => __( 'Content Sidebar', 'eca' ),
-		'id'            => 'sidebar-2',
-		'description'   => __( 'Additional sidebar that appears on the right.', 'eca' ),
-		'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-		'after_widget'  => '</aside>',
-		'before_title'  => '<h1 class="widget-title">',
-		'after_title'   => '</h1>',
-	) );
-	*/
-	register_sidebar( array(
-		'name'          => __( 'Footer Widget Area', 'eca' ),
-		'id'            => 'sidebar-3',
-		'description'   => __( 'Appears in the footer section of the site.', 'eca' ),
-		'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-		'after_widget'  => '</aside>',
-		'before_title'  => '<h1 class="widget-title">',
-		'after_title'   => '</h1>',
-	) );
-	register_sidebar( array(
-		'name'          => __( 'Frontpage Widget Area', 'eca' ),
-		'id'            => 'sidebar-4',
-		'description'   => __( 'Appears on the frontpage template.', 'eca' ),
-		'before_widget' => '<aside id="%1$s" class="widget %2$s">',
-		'after_widget'  => '</aside>',
-		'before_title'  => '<h1 class="widget-title">',
-		'after_title'   => '</h1>',
-	) );
-}
-add_action( 'widgets_init', 'eca_widgets_init' );
-
 
 /**
  * Enqueue scripts and styles for the front end.
@@ -173,8 +124,8 @@ function eca_wp_title( $title, $sep ) {
 }
 add_filter( 'wp_title', 'eca_wp_title', 10, 2 );
 
-/**
 
+/**
  * Add the page slug for the menu into the classes array.
  * 
  * @since ECA 1.0
@@ -190,22 +141,18 @@ function eca_add_slug_nav_class( $classes, $item ) {
 	}
 	return $classes;
 }
-
 add_filter( 'nav_menu_css_class', 'eca_add_slug_nav_class', 10, 2 );
 
 /**
- * Create a 4 column footer widget area in the dashboard
- *
- * @since ECA 1.0
- *
+ * Add 4 footer widget areas
  */
-function tutsplus_widgets_init() {
+function eca_widgets_init() {
  
     // First footer widget area, located in the footer. Empty by default.
     register_sidebar( array(
-        'name' => __( 'First Footer Widget Area', 'tutsplus' ),
+        'name' => __( 'First Footer Widget Area', 'eca' ),
         'id' => 'first-footer-widget-area',
-        'description' => __( 'The first footer widget area', 'tutsplus' ),
+        'description' => __( 'The first footer widget area', 'eca' ),
         'before_widget' => '<div id="%1$s" class="widget-container %2$s">',
         'after_widget' => '</div>',
         'before_title' => '<h3 class="widget-title">',
@@ -214,9 +161,9 @@ function tutsplus_widgets_init() {
  
     // Second Footer Widget Area, located in the footer. Empty by default.
     register_sidebar( array(
-        'name' => __( 'Second Footer Widget Area', 'tutsplus' ),
+        'name' => __( 'Second Footer Widget Area', 'eca' ),
         'id' => 'second-footer-widget-area',
-        'description' => __( 'The second footer widget area', 'tutsplus' ),
+        'description' => __( 'The second footer widget area', 'eca' ),
         'before_widget' => '<div id="%1$s" class="widget-container %2$s">',
         'after_widget' => '</div>',
         'before_title' => '<h3 class="widget-title">',
@@ -225,9 +172,9 @@ function tutsplus_widgets_init() {
  
     // Third Footer Widget Area, located in the footer. Empty by default.
     register_sidebar( array(
-        'name' => __( 'Third Footer Widget Area', 'tutsplus' ),
+        'name' => __( 'Third Footer Widget Area', 'eca' ),
         'id' => 'third-footer-widget-area',
-        'description' => __( 'The third footer widget area', 'tutsplus' ),
+        'description' => __( 'The third footer widget area', 'eca' ),
         'before_widget' => '<div id="%1$s" class="widget-container %2$s">',
         'after_widget' => '</div>',
         'before_title' => '<h3 class="widget-title">',
@@ -236,9 +183,9 @@ function tutsplus_widgets_init() {
  
     // Fourth Footer Widget Area, located in the footer. Empty by default.
     register_sidebar( array(
-        'name' => __( 'Fourth Footer Widget Area', 'tutsplus' ),
+        'name' => __( 'Fourth Footer Widget Area', 'eca' ),
         'id' => 'fourth-footer-widget-area',
-        'description' => __( 'The fourth footer widget area', 'tutsplus' ),
+        'description' => __( 'The fourth footer widget area', 'eca' ),
         'before_widget' => '<div id="%1$s" class="widget-container %2$s">',
         'after_widget' => '</div>',
         'before_title' => '<h3 class="widget-title">',
@@ -247,14 +194,34 @@ function tutsplus_widgets_init() {
          
 }
  
-// Register sidebars by running tutsplus_widgets_init() on the widgets_init hook.
-add_action( 'widgets_init', 'tutsplus_widgets_init' );
+// Register sidebars by running eca_widgets_init() on the widgets_init hook.
+add_action( 'widgets_init', 'eca_widgets_init' );
 
-//Disable old footer widget
-function remove_some_widgets(){
+/**
+ * Disable default footer area
+ */
+function eca_remove_old_widget_area(){
 
 	// Unregister some of the TwentyTen sidebars
 	unregister_sidebar( 'sidebar-3' );
 }
 
-add_action( 'widgets_init', 'remove_some_widgets', 11 );
+add_action( 'widgets_init', 'eca_remove_old_widget_area', 11 );
+
+/**
+ * Ensure cart contents update when products are added to the cart via AJAX
+ * https://docs.woocommerce.com/document/show-cart-contents-total/
+ */
+add_filter( 'woocommerce_add_to_cart_fragments', 'woocommerce_header_add_to_cart_fragment' );
+
+function woocommerce_header_add_to_cart_fragment( $fragments ) {
+	ob_start();
+
+	?>
+	<a class="cart-contents" id="button-cart" href="<?php echo WC()->cart->get_cart_url(); ?>" title="<?php _e( 'View your shopping cart' ); ?>"><?php echo sprintf (_n( '%d item', '%d items', WC()->cart->get_cart_contents_count() ), WC()->cart->get_cart_contents_count() ); ?> - <?php echo WC()->cart->get_cart_total(); ?></a> 
+	<?php
+	
+	$fragments['a.cart-contents'] = ob_get_clean();
+	
+	return $fragments;
+}
