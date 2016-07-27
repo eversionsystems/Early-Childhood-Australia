@@ -67,6 +67,20 @@
 			$( ".summary .price" ).html(price);
 		}
 		
+		$('#eca-table-discounts-heading').click(function(event){
+			event.preventDefault();
+			if($(this).hasClass('expanded')){
+				$('.eca-table-discounts-content').slideToggle();
+				$('#eca-table-discounts-heading a').html('<i class="fa fa-expand" aria-hidden="true"></i> Show quantity discounts');
+				$(this).removeClass('expanded');
+			}
+			else {
+				$('.eca-table-discounts-content').slideToggle();
+				$('#eca-table-discounts-heading a').html('<i class="fa fa-expand" aria-hidden="true"></i> Hide quantity discounts');
+				$(this).addClass('expanded');
+			}
+		});
+		
 	});
 
 })( jQuery );

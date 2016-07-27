@@ -395,21 +395,23 @@ class ECA_Bulk_Product_Prices_Public {
 
 		if($product_sku == 'COEBRCE') {
 		?>
-		<p><strong>Quantity Discounts</strong></p>
-		<table id="eca-table-discounts">
-			<tr>
-				<th>Quantity</th>
-				<th>Member Price</th> 
-				<th>Non-Member Price</th>
-			</tr>
-			<?php foreach ($this->bulk_prices as $bulk_price) { ?>
-			<tr>
-				<td><?php echo $bulk_price[0]; ?></td>
-				<td><?php echo wc_price($bulk_price[1]); ?></td>
-				<td><?php echo wc_price($bulk_price[2]); ?></td>
-			</tr>
-			<?php } ?>
-		</table>
+		<p id="eca-table-discounts-heading"><strong><a href="#"><i class="fa fa-expand" aria-hidden="true"></i> Show quantity discounts</a></strong></p>
+		<div class="eca-table-discounts-content" style="display:none;">
+			<table id="eca-table-discounts">
+				<tr>
+					<th>Quantity</th>
+					<th>Member Price</th> 
+					<th>Non-Member Price</th>
+				</tr>
+				<?php foreach ($this->bulk_prices as $bulk_price) { ?>
+				<tr>
+					<td><?php echo $bulk_price[0]; ?></td>
+					<td><?php echo wc_price($bulk_price[1]); ?></td>
+					<td><?php echo wc_price($bulk_price[2]); ?></td>
+				</tr>
+				<?php } ?>
+			</table>
+		</div>
 		<?php		
 		}
 	}

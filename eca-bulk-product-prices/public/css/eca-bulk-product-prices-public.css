@@ -18,10 +18,16 @@
     padding: 2px;
  }
  
-  #eca-table-discounts td {
+ #eca-table-discounts td {
     border: 1px solid #efefef;
     padding: 2px;
 }
+
+ #eca-table-discounts th {
+	border: 1px solid #efefef;
+	text-align: left;
+    padding: 2px;
+ }
 
 /*
  .quantity_select {
