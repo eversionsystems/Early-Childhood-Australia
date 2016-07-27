@@ -1,0 +1,31 @@
+/**
+ * All of the CSS for your public-facing functionality should be
+ * included in this file.
+ */
+ 
+ .quantity_select select {
+ 	background: #f7f7f7;
+    background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0));
+    border: 1px solid #d1d1d1;
+    border-radius: 2px;
+    color: #686868;
+    padding: 0.625em 0.4375em;
+}
+
+ #eca-table-discounts tr {
+	border: 1px solid #efefef;
+	text-align: left;
+    padding: 2px;
+ }
+ 
+  #eca-table-discounts td {
+    border: 1px solid #efefef;
+    padding: 2px;
+}
+
+/*
+ .quantity_select {
+	float:left;
+	margin-right:5px;
+ }
+ */
