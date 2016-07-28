@@ -3,7 +3,7 @@
 Plugin Name: ECA License Product
 Plugin URI: http://eversionsystems.com
 Description: Create a license product
-Version: 1.0
+Version: 1.0.1
 Author: Andrew Schultz
 Author URI: http://eversionsystems.com
 License: GPL2
@@ -137,34 +137,22 @@ function es_attach_terms_conditions_pdf_to_email ( $attachments, $status , $orde
 	date_add($tmp_date, date_interval_create_from_date_string("365 days"));
 	$end_date = date_format($tmp_date,"d/m/Y");
 	
-	//$end_date = date('d/m/Y', strtotime("+365 days"));
-	
 	$billing_address = $order->get_address('billing');
-	//write_log($billing_address);
-	//write_log('Billing address line 1 = '.$order->billing_address_1);
 	$company_abn = $order->billing_abn;
 	$company_name = $billing_address['company'];
 	$full_address = $billing_address['address_1'].', '.$billing_address['city'].', '.$billing_address['state'].', '.$billing_address['postcode'];
-
-	//write_log($order_date);
-	//write_log($company_name);
-	//write_log($full_address);
 	
     foreach ($order_items as $order_item_id => $order_item) { 
-		//write_log($order_item);
 		$is_licensed_product = get_post_meta($order_item['product_id'], 'license_product', true );
 		
-		if($is_licensed_product)
+		if($is_licensed_product == 'yes')
 			break;
-		//$is_licensed_product = $order->get_item_meta($order_item_id, 'license_product');
-		//write_log('Is licensed = '.$is_licensed_product);
     }
 	
-	if( isset( $status ) && in_array ( $status, $allowed_statuses ) && $is_licensed_product ) {
+	if( isset( $status ) && in_array ( $status, $allowed_statuses ) && $is_licensed_product == 'yes' ) {
 		//$pdf_path = get_template_directory() . '/Service_Provider_PDF_Agreement_Template.pdf';
 		$dir = plugin_dir_path( __FILE__ );
 		$pdf_path = $dir . '/Service_Provider_PDF_Agreement_Template.pdf';
-		//write_log($pdf_path);
 		
 		if (!file_exists($dir.'/temp')) {
 			mkdir($dir.'/temp', 0755, true);
@@ -175,23 +163,7 @@ function es_attach_terms_conditions_pdf_to_email ( $attachments, $status , $orde
 		
 		//$dest_file = '/webfiles/shoptest/tmp/terms_and_conditions-'.$order_id.'.pdf';
 		
-		//$pdf = new FPDI();
 		$pdf= new ESPDF();
-		
-		/*$pdf->AddPage();
-		$pdf->setSourceFile($pdf_path); 
-		// import page 1 for modifying
-		$tplIdx = $pdf->importPage(1); 
-		//use the imported page and place it at point 0,0; calculate width and height
-		//automaticallay and ajust the page size to the size of the imported page 
-		$pdf->useTemplate($tplIdx, 0, 0, 0, 0, true); 
-		
-		$pdf->SetFont('Arial'); 
-		$pdf->SetTextColor(255,0,0); 
-		$pdf->SetXY(25, 25); 
-		$pdf->Write(0, "This is just a simple text"); 
-		
-		$pdf->Output( $dest_file, 'F' );*/
 		
 		$pageCount = $pdf->setSourceFile($pdf_path);
 		
