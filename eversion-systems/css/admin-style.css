@@ -1,0 +1,64 @@
+/**
+* File : admin-style.css
+* Author : Andrew Schultz
+* Company : Eversion Systems
+* Purpose : Style dashboard administration screens
+*/
+
+#order_notes_packing_slip {
+	width:30px;
+	text-align:center;
+}
+
+.packing-slip {
+	/*background-position:2px 2px;*/
+	background-color:rgba(70, 181, 37,0.8);
+	background-size: 10% 10%;
+}
+
+.order_notes_packing_slip .note-on{
+	display:block;
+	text-indent:-9999px;
+	position:relative;
+	height:1em;
+	width:1em;
+	margin:0 auto;
+	color:#999
+}
+
+.order_notes_packing_slip .note-on:after{
+	font-family:WooCommerce;
+	speak:none;
+	font-weight:400;
+	font-variant:normal;
+	text-transform:none;
+	-webkit-font-smoothing:antialiased;
+	margin:0;
+	text-indent:0;
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	text-align:center;
+	content:"\e027";
+	line-height:16px
+}
+
+/*
+* Reduce size of user profile screens for default WordPress fields
+*/
+.form-table th {
+    padding: 5px 10px 5px 0px;
+}
+
+.form-table td {
+    padding: 5px 5px;
+}
+
+/*
+* User Meta Profile custom fields sizing for user profile screen
+*/
+.um_field_container {
+    margin: 0px !important;
+}

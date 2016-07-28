@@ -1,0 +1,20 @@
+/**
+* Name : 	ee-admin-style.css
+* Author : 	Andrew Schultz
+* Purpose : Style for Event Espresso New Events
+*/
+
+.two-columns {
+	-webkit-column-count:2; /* Chrome, Safari, Opera */
+	-moz-column-count:2; /* Firefox */
+	column-count:2;
+	-webkit-column-gap:10px; /* Chrome, Safari, Opera */
+	-moz-column-gap:10px; /* Firefox */
+	column-gap:10px;
+	vertical-align:middle;
+} 
+
+.two-columns  .rwmb-field{
+	float:left;
+	margin:5px;
+}

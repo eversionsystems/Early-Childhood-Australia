@@ -1,0 +1,66 @@
+/**
+* Name : style-custom.css
+* Author : Andrew Schultz
+* Purpose : Custom css for Earlychildhood woocommerce and custom demographic fields and various other theme customisations
+*/
+
+/**
+* Slider Revolution
+*/
+
+
+.tp-leftarrow.custom {	z-index:100;cursor:pointer; position:relative;	background:url('images/arrowleft.png') no-repeat top left;		width:9px;	height:16px;   float:left;	margin-right:6px; margin-top:10px}
+.tp-rightarrow.custom {	z-index:100;cursor:pointer; position:relative;	background:url('images/arrowright.png') no-repeat top left;	width:9px;	height:16px;   float:left;	margin-left:6px; margin-top:10px}
+
+.tp-leftarrow:hover,
+.tp-rightarrow:hover {	background-position:bottom left; }
+
+.two-columns {
+	-webkit-column-count:2; /* Chrome, Safari, Opera */
+	-moz-column-count:2; /* Firefox */
+	column-count:2;
+	-webkit-column-gap:10px; /* Chrome, Safari, Opera */
+	-moz-column-gap:10px; /* Firefox */
+	column-gap:10px;
+	vertical-align:middle;
+} 
+
+.two-columns  input{
+	float:left;
+	margin:5px;
+}
+
+.two-columns  label{
+	display: block;
+	padding: 0px 0px 5px 0px;
+} 
+
+.um-form-style .um_field_container {
+	margin:10px 0px 10px 0px;
+}
+
+.student-checkbox  input{
+	float:left;
+	margin:5px;
+}
+
+.student-checkbox label {
+	display: block;
+}
+
+/* Datetime picker */
+.ui-datepicker-trigger {
+	background:none;
+	padding:5px;
+	border-color:none;
+	border-style:none;
+}
+
+/**
+* POP FOR ADD TO CART
+*/
+@media only screen and (max-width: 480px) {
+	div#festi-cart-pop-up-content div.festi-cart-pop-up-body {
+		width: 280px !important;
+	}
+}

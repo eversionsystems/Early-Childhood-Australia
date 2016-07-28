@@ -1,0 +1,48 @@
+/**
+* Fix issues with blurry related images and thumbnails stretching in Woocommerce
+*/
+/*
+.woocommerce .related ul.products li.product, .woocommerce .related ul li.product, .woocommerce .upsells.products ul.products li.product, .woocommerce .upsells.products ul li.product, .woocommerce-page .related ul.products li.product, .woocommerce-page .related ul li.product, .woocommerce-page .upsells.products ul.products li.product, .woocommerce-page .upsells.products ul li.product {
+	width:auto !important; 
+	height: auto !important;
+}
+*/
+
+/* Main shop loop products */
+.woocommerce ul.products li.product a img, .woocommerce-page ul.products li.product a img {
+    /*width: 75% !important;*/
+	width:auto; 
+	height: auto;
+}
+
+/* fix cart totals formatting */
+.woocommerce .cart-collaterals .cart_totals, .woocommerce-page .cart-collaterals .cart_totals {
+	width: auto;
+	float: left;
+	text-align: left;
+}
+
+/* Related product images */
+.woocommerce .related ul li.product img, .woocommerce .related ul.products li.product img, .woocommerce .upsells.products ul li.product img, .woocommerce .upsells.products ul.products li.product img, .woocommerce-page .related ul li.product img, .woocommerce-page .related ul.products li.product img, .woocommerce-page .upsells.products ul li.product img, .woocommerce-page .upsells.products ul.products li.product img {
+	width:auto !important; 
+	height: auto !important;
+}
+
+/* Product page image */
+.woocommerce #content div.product div.images img, .woocommerce div.product div.images img, .woocommerce-page #content div.product div.images img, .woocommerce-page div.product div.images img {
+	width:auto;
+}
+
+/* Product heading */
+h1.entry-title.product_title {
+	font-size: 32px;
+}
+
+/* Hide the review comments box and people's review text*/
+.comment-form-comment {
+    display: none;
+}
+
+.comment-text .description {
+	display: none;
+}
