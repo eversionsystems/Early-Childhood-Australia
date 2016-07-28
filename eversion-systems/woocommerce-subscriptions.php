@@ -46,8 +46,17 @@ function es_subscription_end_date_selector($item_id, $item, $_product) {
 			</tr>
 			<tr>
 				<td colspan="4">
-				<input type="hidden" name="subscription_item_id_<?php echo $item_id;?>" id="subscription_item_id_<?php echo $item_id;?>" value="<?php echo $item_id;?>">
-				<button id="modify_subscription_period_<?php echo $item_id;?>" class="button-primary">Update Subscription</button>
+					<input type="hidden" name="subscription_item_id_<?php echo $item_id;?>" id="subscription_item_id_<?php echo $item_id;?>" value="<?php echo $item_id;?>">
+					<button id="modify_subscription_period_<?php echo $item_id;?>" class="button-primary">Update Subscription</button>
+					<div id="expire-action" style="margin-top:10px">
+					<?php
+					global $post;
+					$post_id = $post->ID;
+					$post_name =  $_product->post->post_title;
+					$subscription_status = wc_get_order_item_meta($item_id, '_subscription_status');
+					?>
+					<button id="expire_subscription_<?php echo $item_id;?>" name ="expire_subscription_<?php echo $item_id;?>" value="expire_subscription_<?php echo $item_id;?>" class="button-primary" <?php if ( $subscription_status == 'expired' ) echo 'disabled="disabled"';?> onclick="if ( confirm('<?php echo esc_js(sprintf(__("You are about to expire this subscription '%s'\n  'Cancel' to stop, 'OK' to expire subscription."), $post_name )); ?>') ) {return true;}return false;">Cancel Subscription</button>
+					</div>
 				</td>
 			</tr>
 		</table>
@@ -68,6 +77,7 @@ function es_modify_subscription_data($post_id, $post) {
 	//Check for which subscription button was pressed
 	foreach ($_POST['order_item_id'] as $item_id) {
 		$sub_button_name = 'subscription_item_id_'.$item_id;
+		$expire_button_name = 'expire_subscription_' . $item_id;
 		
 		if(isset($_POST[$sub_button_name])) {
 			//subscription button pressed
@@ -111,6 +121,15 @@ function es_modify_subscription_data($post_id, $post) {
 				WC_Subscriptions_Manager::set_next_payment_date($subscription_key, $user_id, $end_dtm_obj->format('Y-m-d H:i:s'));
 				$next_payment_timestamp = WC_Subscriptions_Manager::get_next_payment_date( $subscription_key, $user_id, 'timestamp' );
 			}
+		}
+		
+		if( isset($_POST[$expire_button_name]) ) {
+			$datetime_now = new DateTime();
+			wc_update_order_item_meta( $item_id, '_subscription_expiry_date', $datetime_now->format('Y-m-d H:i:s'));
+			wc_update_order_item_meta( $item_id, '_subscription_status', 'expired');
+			
+			$order = new WC_Order($post_id);
+			$order->add_order_note('Subscription cancelled', 0, true);
 		}
 	}
 }
