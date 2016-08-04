@@ -16,7 +16,7 @@
  * Plugin Name:       ECA Bulk Product Prices
  * Plugin URI:        http://eversionsystems.com/eca-bulk-product-prices-uri/
  * Description:       Sell product SKU COEBRCE with custom bulk prices.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            Eversion Systems
  * Author URI:        http://eversionsystems.com/
  * License:           GPL-2.0+

@@ -30,22 +30,28 @@
 	 */
 	
 	$(function() {
+		var selectedValue = '';
+		
 		$(".quantity_select select").change(function() {
-			var selectedValue = $( this ).val();
+			selectedValue = $( this ).val();
 			
 			setSelectedPrice(selectedValue);
 		});
 		
 		//Default the price on load
 		var price = '';
-		var selectedValue
 		
 		if ( bulk_prices.selected_quantity == 0 )
 			selectedValue = $("[name='quantity']").val();
 		else
 			selectedValue = bulk_prices.selected_quantity;
 		
-		if(bulk_prices.product_slug == 'code-of-ethics-brochure')
+		var productSlug = '';
+		
+		if(typeof (bulk_prices.product_slug) == 'object')
+			productSlug = bulk_prices.product_slug['post']['post_name'];
+		
+		if(productSlug == 'code-of-ethics-brochure')
 			setSelectedPrice(selectedValue);
 		
 		function setSelectedPrice(selectedValue) {
@@ -58,7 +64,7 @@
 						price = '<ins style="display: block;color:#000"><span class="woocommerce-Price-amount amount">' + accounting.formatMoney(bulk_prices.prices[i][2]) + '</span></ins>' +
 								'<ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' + accounting.formatMoney(bulk_prices.prices[i][1]) + '</span> Member Price <i class="fa fa-check"></i></ins>';
 					else
-						price = '<ins style="display: block;color:#000"><span class="woocommerce-Price-amount amount">' +  accounting.formatMoney(bulk_prices.prices[i][2]) + '</span><i class="fa fa-check"></i></ins>' +
+						price = '<ins style="display: block;color:#000"><span class="woocommerce-Price-amount amount">' +  accounting.formatMoney(bulk_prices.prices[i][2]) + '</span> <i class="fa fa-check"></i></ins>' +
 								'<ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' + accounting.formatMoney(bulk_prices.prices[i][1]) + '</span> Member Price</ins>';;
 				}
 			}

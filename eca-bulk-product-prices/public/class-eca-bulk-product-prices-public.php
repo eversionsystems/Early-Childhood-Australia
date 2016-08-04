@@ -196,12 +196,23 @@ class ECA_Bulk_Product_Prices_Public {
 	/**
 	 * Show the price of the bulk item on the shop page.
 	 *
-	 * @since    1.0.0
+	 * @since   1.0.0
+	 * @since	1.0.1	Added fix for checking for checkout page and show member and non-member prices.
 	 */
-	public function get_bulk_price($price, $product) {
-		if($product->get_sku() == 'COEBRCE') {
-			
-			return 'From $10.00 for 10';
+	public function get_bulk_price( $price, $product ) {
+		// Don't run this function on the checkout.  We have a gift plugin running that adds a free item to the cart when
+		// they are on the checkout page which causes issues with the get_sku() function
+		if ( ! is_checkout() ) {
+			if( $product->get_sku() == 'COEBRCE' ) {
+				if ( count($this->bulk_prices) > 0 ) {
+					$member_exists = es_check_membership_held();
+					
+					if($member_exists)
+						return '<ins style="display: block;color:#000">From <span class="woocommerce-Price-amount amount">' . wc_price($this->bulk_prices[0][2]) . ' for ' . $this->bulk_prices[0][0] . '</span></ins><ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' . wc_price($this->bulk_prices[0][1]) . ' for ' . $this->bulk_prices[0][0] . '</span> Member Price <i class="fa fa-check"></i></ins>';
+					else
+						return '<ins style="display: block;color:#000">From <span class="woocommerce-Price-amount amount">' . wc_price($this->bulk_prices[0][2]) . ' for ' . $this->bulk_prices[0][0] . '</span> <i class="fa fa-check"></i></ins><ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' . wc_price($this->bulk_prices[0][1]) . ' for ' . $this->bulk_prices[0][0] . '</span> Member Price</ins>';
+				}
+			}
 		}
 		
 		return $price;
