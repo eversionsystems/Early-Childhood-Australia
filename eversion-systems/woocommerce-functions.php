@@ -855,7 +855,7 @@ function es_product_bulk_price($price, $quantity, $sku) {
 	}
 	elseif($sku == 'SUND621') {
 		if ($quantity >= 5)
-			$price = 19.95;
+			$price = 24.95;
 	}
 	elseif($sku == 'SUND620') {
 		if ($quantity >= 5)
