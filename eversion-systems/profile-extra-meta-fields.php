@@ -14,7 +14,7 @@
 */
 
 //Add customer number at the top of the my account page
-add_action( 'woocommerce_before_my_account', 'es_add_customer_number_my_account');
+//add_action( 'woocommerce_before_my_account', 'es_add_customer_number_my_account');
 
 function es_add_customer_number_my_account() {
 	$user_id = get_current_user_id();
