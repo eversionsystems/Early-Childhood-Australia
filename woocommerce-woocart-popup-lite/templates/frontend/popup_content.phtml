@@ -2,11 +2,12 @@
 	<?php 
 	//global $woocommerce;
 	$spend_required = 500 - $woocommerce->cart->subtotal;
-		
-	if($spend_required > 0)
-		echo '<br><span style="color: #5B9E2B;font-size: 20px;">Spend $'. number_format($spend_required, 2, '.', '').' more to get FREE SHIPPING!</span>';
-	else
+	$shipping_cost = WC()->session->get( 'shipping_total' );
+	
+	if ( $shipping_cost == 0 )
 		echo '<br><span style="color: #5B9E2B;font-size: 20px;">CONGRATULATIONS!! You\'ve qualified for FREE SHIPPING!</span>';
+	else if ( $spend_required > 0 )
+		echo '<br><span style="color: #5B9E2B;font-size: 20px;">Spend $'. number_format($spend_required, 2, '.', '').' more to get FREE SHIPPING!</span>';
 	?>
 <div id="festi-cart-pop-up-products-list-body">
     <table class="festi-cart-list">
