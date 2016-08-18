@@ -747,6 +747,33 @@ function es_override_product_price($price, $product) {
 			}
 		}
 	}
+	else if ( ! empty( $product ) AND is_admin() ) {
+		$display_price = $product->get_display_price();
+		$display_regular_price = $product->get_display_price( $product->get_regular_price() );
+		$sale_price = $product->sale_price;
+		$member_price = get_post_meta( $product->id, 'member_price', true );
+		
+		if( $product->is_on_sale() && $member_exists && $member_price > 0 )
+			$price = '<ins style="display: block;color:#000">'.wc_price($product->get_regular_price()).$product->get_price_suffix().'</ins>';
+		
+		if( $product->get_price() > 0 ) {
+
+			//if( $product->is_on_sale() && $member_exists && $member_price > 0 )
+				//$price .= '<span style="display: block;">'.wc_price( $sale_price ).$product->get_price_suffix().' Sale Price</span>';
+			
+			if ( $member_price > 0 )
+				$price .= '<span style="display: block;color:#77A464">'.wc_price( $member_price ).$product->get_price_suffix().' Member Price</span>';
+
+		} 
+		elseif ( $product->get_price() == 0 ) {
+			if ( $product->is_on_sale() && $product->get_regular_price() ) {
+				$price .= $product->get_price_html_from_to( $display_regular_price, __( 'Free!', 'woocommerce' ) );
+			} 
+			else {
+				$price = __( 'Free!', 'woocommerce' );
+			}
+		}
+	}
 	
 	return  $price;
 }
@@ -882,35 +909,35 @@ function hide_shipping_when_free_is_available( $rates, $package ) {
  	global $woocommerce;
 	
 	//Stop promotion after 1st June
-	if( '20160601' > date("Ymd") ) {
+	//if( '20160601' > date("Ymd") ) {
 	
-		$products = $woocommerce->cart->get_cart(); //Returns the contents of the cart in an array with the 'data' element.
-		$count_pub41 = 0;
-		$only_pub41 = true;
+	$products = $woocommerce->cart->get_cart(); //Returns the contents of the cart in an array with the 'data' element.
+	$count_pub41 = 0;
+	$only_pub41 = true;
+	
+	foreach( $products as $product ) {
+		//All extended meta data is stored in a 'data' array, stores the WC_Product_Simple Object which contains
+		//information about the product
 		
-		foreach( $products as $product ) {
-			//All extended meta data is stored in a 'data' array, stores the WC_Product_Simple Object which contains
-			//information about the product
-			
-			$_product = $product['data'];
-			$SKU = $_product->get_sku();
+		$_product = $product['data'];
+		$SKU = $_product->get_sku();
 
-			if ($SKU == 'PUB41') {
-				$count_pub41 = $product['quantity'];
-			}
-			else if (!$_product->is_virtual()) {
-				$only_pub41 = false;
-			}
+		if ($SKU == 'PUB41') {
+			$count_pub41 = $product['quantity'];
 		}
-	 
-		if ($count_pub41 >= 20 AND $only_pub41) {
-			//$rates['free_shipping'] = new WC_Shipping_Rate('free_shipping', 'Free Shipping', 0, array(), '');
-			unset( $rates['flat_rate'] );
-			unset( $rates['eca_shipping_express'] );
-			//unset( $rates['eca_shipping']);
-			$rates['eca_shipping']->cost = 0;
+		else if (!$_product->is_virtual()) {
+			$only_pub41 = false;
 		}
 	}
+ 
+	if ( $count_pub41 >= 50 AND $only_pub41 ) {
+		//$rates['free_shipping'] = new WC_Shipping_Rate('free_shipping', 'Free Shipping', 0, array(), '');
+		unset( $rates['flat_rate'] );
+		unset( $rates['eca_shipping_express'] );
+		//unset( $rates['eca_shipping']);
+		$rates['eca_shipping']->cost = 0;
+	}
+	//}
 	
 	return $rates;
 }
@@ -1191,6 +1218,189 @@ function es_add_catalog_order_args_member_price($args) {
 	}
 	
 	return $args;
+}
+
+/**
+ * My Account functionality
+ * Tabbed my account page introduced in WC 2.6
+ * Removed php file my-account-extra-meta.php
+ * Function woocommerce_before_my_account is now depreciated
+ */
+
+add_action ( 'woocommerce_account_dashboard', 'es_display_my_dashboard_customer_number');
+
+function es_display_my_dashboard_customer_number() {
+	$user_id = get_current_user_id();
+	$member_number = get_user_meta($user_id, 'old_customer_number', true);
+
+	if ( !empty( $member_number) ) {
+		$customer_number = $member_number;
+	}
+	else {
+		$customer_number = 'A' . $user_id;
+	}
+	
+	$user_array = array(
+		'user_id' => $user_id,
+		'user_login' => null,
+		'user_email' => null,
+		'format' => '',
+		'list_class' => 'groups',
+		'item_class' => 'name',
+		'order_by' => 'name',
+		'order' => 'ASC'
+	);
+
+	ob_start();
+	
+	?>
+	<h2>Customer Number</h2>
+	<div style="width: 150px;color:#ED1C24;border-width: 0px 1px 1px 0px;padding: 4px 8px;vertical-align: middle;border: 1px solid rgba(0, 0, 0, 0.1);font-size: 1.4em !important;">
+		<?php echo $customer_number;?>
+	</div>
+	<?php
+	// Check Pay Per Post plugin is active
+	if ( class_exists( 'Woocommerce_PayPerPost' ) ) {
+		$pay_per_posts = do_shortcode( '[woocommerce-payperpost template="purchased"]' );
+		
+		if( ! empty( $pay_per_posts ) ) {
+			echo '<h2>My Online Purchases</h2>' . $pay_per_posts;
+		}
+	}
+	
+	// Check for plugin Groups
+	if ( class_exists( 'Groups_WordPress' ) ) {
+		$user_groups_string = do_shortcode_func ( 'groups_user_groups', $user_array );
+		
+		// Check for User Meta Plugin
+		if ( class_exists( 'userMeta' ) ) {
+			if ( strpos( $user_groups_string, 'Individual' ) ) {
+				echo '<h2>Individual Questions</h2>';
+				echo do_shortcode( '[user-meta type="profile" form="Individual Member"]' );
+			}
+			else if ( strpos( $user_groups_string, 'Service' ) ) {
+				echo '<h2>Service Questions</h2>';
+				echo do_shortcode( '[user-meta type="profile" form="Service Member"]' );
+				if ( class_exists( 'wpDataTableConstructor' ) ) {
+					echo '<h2>Contacts</h2>';
+					echo do_shortcode( '[wpdatatable id=1]' );
+				}
+			}
+			else if ( strpos( $user_groups_string, 'Organisation' ) ) {
+				echo '<h2>Organisation Questions</h2>';
+				echo do_shortcode( '[user-meta type="profile" form="Organisation Member"]' );
+				if ( class_exists( 'wpDataTableConstructor' ) ) {
+					echo '<h2>Contacts</h2>';
+					echo do_shortcode( '[wpdatatable id=1]' );
+				}
+			}
+			else if ( strpos( $user_groups_string, 'Concession' ) ) {
+				echo '<h2>Concession Questions</h2>';
+				echo do_shortcode( '[user-meta type="profile" form="Concession Member"]' );
+			}
+		}
+	}
+	
+	ob_end_flush();
+}
+
+add_filter( 'woocommerce_product_filters', 'es_custom_product_filters', 10, 1 );
+
+/**
+ * Add a custom filters for WooCommerce products.
+ *
+ * @param string $output
+ */
+function es_custom_product_filters( $output ) {
+	global $wp_query;
+	
+	foreach ( $wp_query->query_vars['meta_query'] as $key => $value ) {
+		if ( $value['key'] == '_backorders' ) {
+			$current_backorders_value = isset( $value['value'] ) ? $value['value'] : '';
+		}
+		elseif ( $value['key'] == 'member_price' ) {
+			$curent_price_value = isset( $value['value'] ) ? $value['value'] : '';
+			$current_price_key = $value['key'];
+		}
+		elseif ( $value['key'] == '_sale_price' ) {
+			$curent_price_value = isset( $value['value'] ) ? $value['value'] : '';
+			$current_price_key = $value['key'];
+		}
+	}
+	
+	//$current_backorders_value = isset( $wp_query->query_vars['meta_value'] ) ? $wp_query->query_vars['meta_value'] : '';
+	
+	$output .= '<select id="allow-backorders-filter" class="backorders" name="allow_backorders_filter">';
+	$output .= '<option value="" ' .  selected( $current_backorders_value, '', false ) . '>' . __( 'Allow backorders?', 'woocommerce' ) . '</option>';
+	//<option selected="selected" value="">Allow backorders?</option>';
+
+	$options = array(
+		'no'     => __( 'Do not allow', 'woocommerce' ),
+		'notify' => __( 'Allow, but notify customer', 'woocommerce' ),
+		'yes'    => __( 'Allow', 'woocommerce' )
+	);
+	
+	foreach ( $options as $key => $value ) {
+		$output .= '<option value="' . esc_attr( $key ) . '"' . selected( $current_backorders_value, $key, false ) . '>'. $value .'</option>';
+	}
+	
+	$output .= '</select>';
+	
+	$output .='<select id="price-filter" class="" name="price_filter">
+				<option value="" ' . selected( $curent_price_value, '', false ) . '>Show All Prices</option>
+				<option value="member-price" ' . selected( $current_price_key, 'member_price', false ) . '>Member Prices</option>
+				<option value="sale-price" ' . selected( $current_price_key, '_sale_price', false ) . '>Sale Prices</option>
+				</select>';
+	
+	return $output;
+}
+
+add_filter ( 'parse_query', 'es_filter_products_query' );
+
+/**
+ * Filter the products in admin based on options.
+ *
+ * @param mixed $query object passed by reference
+ */
+function es_filter_products_query( &$query ) {
+	global $typenow, $wp_query;
+
+	if ( 'product' == $typenow ) {
+		if ( isset( $_GET['allow_backorders_filter'] ) && ! empty ( $_GET['allow_backorders_filter'] ) ) {
+			$backorders = array(
+                'key' => '_backorders',
+                'value' => $_GET['allow_backorders_filter'],
+                'compare' => '='
+            );
+			
+			$meta_query_array[] = $backorders;
+			//$query->query_vars['meta_value']    = $_GET['allow_backorders_filter'];
+			//$query->query_vars['meta_key']      = '_backorders';
+		}
+		
+		if ( isset( $_GET['price_filter'] ) && ! empty ( $_GET['price_filter'] ) ) {
+			
+			if ( $_GET['price_filter'] == 'member-price' )
+				$prices = array(
+					'key' => 'member_price',
+					'value' => 0,
+					'compare' => '>'
+				);
+			elseif ( $_GET['price_filter'] == 'sale-price' )
+				$prices = array(
+					'key' => '_sale_price',
+					'value' => 0,
+					'compare' => '>'
+				);
+			
+			$meta_query_array[] = $prices;
+			//$query->query_vars['meta_value']    = $_GET['allow_backorders_filter'];
+			//$query->query_vars['meta_key']      = '_backorders';
+		}
+		
+		if (!empty($meta_query_array))
+			$query->query_vars['meta_query'] = $meta_query_array;
+	}
 }
 
 ?>
