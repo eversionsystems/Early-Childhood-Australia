@@ -1,12 +1,15 @@
 <div class="festi-cart-pop-up-products-content">
 	<?php 
-	//global $woocommerce;
+	global $woocommerce;
+	$cart_count = $woocommerce->cart->cart_contents_count;
 	$spend_required = 500 - $woocommerce->cart->subtotal;
 	$shipping_cost = WC()->session->get( 'shipping_total' );
 	
-	if ( $shipping_cost == 0 )
+	if ( $cart_count == 0)
+		echo '<br><span style="color: #5B9E2B;font-size: 20px;">Your Cart Is Empty</span>';
+	elseif ( $shipping_cost == 0 AND $cart_count > 0 )
 		echo '<br><span style="color: #5B9E2B;font-size: 20px;">CONGRATULATIONS!! You\'ve qualified for FREE SHIPPING!</span>';
-	else if ( $spend_required > 0 )
+	elseif ( $spend_required > 0 )
 		echo '<br><span style="color: #5B9E2B;font-size: 20px;">Spend $'. number_format($spend_required, 2, '.', '').' more to get FREE SHIPPING!</span>';
 	?>
 <div id="festi-cart-pop-up-products-list-body">
