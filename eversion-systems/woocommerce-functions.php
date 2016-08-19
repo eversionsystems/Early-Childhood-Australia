@@ -815,9 +815,13 @@ function es_get_product_price($cart_item) {
 	$quantity = intval( $cart_item['quantity'] );
 	
 	$meta = get_post_meta($product_id);
-	$sale_price = $meta['_sale_price'][0];
+	if ( isset( $meta['_sale_price'][0] ) )
+		$sale_price = $meta['_sale_price'][0];
 	$normal_price = $meta['_regular_price'][0];
-	$member_price = $meta['member_price'][0];
+	if ( isset( $meta['member_price'][0] ) )
+		$member_price = $meta['member_price'][0];
+	else 
+		$member_price = '';
 	$sku = $meta['_sku'][0];
 	
 	//Check if logged in user is a member
@@ -1209,12 +1213,12 @@ function es_add_catalog_order_args_member_price($args) {
 	
 	if(isset( $_GET['orderby'] )) {
 		$orderby_value = woocommerce_clean( $_GET['orderby'] );
-	}
-	
-	if($orderby_value == 'member_price') {
-		$args['meta_key'] = 'member_price';
-		$args['order'] = 'ASC';
-		$args['orderby'] = 'meta_value_num';
+		
+		if($orderby_value == 'member_price') {
+			$args['meta_key'] = 'member_price';
+			$args['order'] = 'ASC';
+			$args['orderby'] = 'meta_value_num';
+		}
 	}
 	
 	return $args;
