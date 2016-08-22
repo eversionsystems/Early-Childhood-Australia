@@ -46,3 +46,17 @@ h1.entry-title.product_title {
 .comment-text .description {
 	display: none;
 }
+
+/**
+ * Fix Related Products not showing horizontally
+ */
+.single-product ul.products li.first {
+	clear:none;
+}
+
+/**
+ * Fix Category Page Listing Products
+ */
+.tax-product_cat ul.products li.first {
+    clear: both;
+}

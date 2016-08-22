@@ -19,7 +19,7 @@ function eca_manage_woocommerce_styles(){
 	//$slug = get_post( $post )->post_name;
 
 	//if($slug == 'my-account'){
-	wp_enqueue_style('eca-woocommerce-custom-css', constant( 'EVERSION_PLUGIN_URL' ).'/woocommerce-custom.css');
+	wp_enqueue_style('eca-woocommerce-custom', constant( 'EVERSION_PLUGIN_URL' ).'/woocommerce-custom.css', '', '1.0');
 	//}
 }
 
