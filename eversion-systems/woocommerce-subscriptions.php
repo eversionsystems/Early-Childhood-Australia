@@ -13,56 +13,54 @@ add_action ('woocommerce_after_order_itemmeta', 'es_subscription_end_date_select
 
 function es_subscription_end_date_selector($item_id, $item, $_product) {
 
-	if ( isset( $_product ) ) {
-		$_custom_values = $_product->product_custom_fields;
-		
-		if(isset($_custom_values['license_product']))
-			$licence_product = $_custom_values['license_product'];
-		else
-			$licence_product[0] = 'no';
-
-		if ($_product->is_type('subscription')) {
-			if(isset($licence_product) && $licence_product[0] == 'no') {
-			?>
+	$_custom_values = $_product->product_custom_fields;
+	
+	if(isset($_custom_values['license_product']))
+		$licence_product = $_custom_values['license_product'];
+	else
+		$licence_product[0] = 'no';
 			
-			<table id="modify_subscription_length" class="display_meta" cellspacing="0">
-				<tr>
-				<th style="width:100px"><label for="subscription_end_dtm_<?php echo $item_id;?>">End Date</label></th>
-					<td>
-					<script type="text/javascript">
-					jQuery(document).ready( function($) {
-						$( "#subscription_end_dtm_<?php echo $item_id;?>" ).datepicker( {
-							dateFormat: 'yy-mm-dd',
-							showOn: "button",
-							buttonImage: "<?php echo EVERSION_PLUGIN_URL;?>/images/calendar.gif",
-							buttonImageOnly: false,
-							buttonText: "Select date"
-						});
-						
-						$( "#subscription_end_dtm_<?php echo $item_id;?>" ).datepicker( 'setDate', '<?php echo wc_get_order_item_meta($item_id,'_subscription_expiry_date');?>');
+	if ($_product->is_type('subscription')) {
+		if(isset($licence_product) && $licence_product[0] == 'no') {
+		?>
+		
+		<table id="modify_subscription_length" class="display_meta" cellspacing="0">
+			<tr>
+			<th style="width:100px"><label for="subscription_end_dtm_<?php echo $item_id;?>">End Date</label></th>
+				<td>
+				<script type="text/javascript">
+				jQuery(document).ready( function($) {
+					$( "#subscription_end_dtm_<?php echo $item_id;?>" ).datepicker( {
+						dateFormat: 'yy-mm-dd',
+						showOn: "button",
+						buttonImage: "<?php echo EVERSION_PLUGIN_URL;?>/images/calendar.gif",
+						buttonImageOnly: false,
+						buttonText: "Select date"
 					});
-					</script>
-					<input type="text" name="subscription_end_dtm_<?php echo $item_id;?>" id="subscription_end_dtm_<?php echo $item_id;?>" style="width:100px;border: 1px solid #DDD;">
-					</td>
-				</tr>
-				<tr>
-					<td colspan="4">
-						<input type="hidden" name="subscription_item_id_<?php echo $item_id;?>" id="subscription_item_id_<?php echo $item_id;?>" value="<?php echo $item_id;?>">
-						<button id="modify_subscription_period_<?php echo $item_id;?>" class="button-primary">Update Subscription</button>
-						<div id="expire-action" style="margin-top:10px">
-						<?php
-						global $post;
-						$post_id = $post->ID;
-						$post_name =  $_product->post->post_title;
-						$subscription_status = wc_get_order_item_meta($item_id, '_subscription_status');
-						?>
-						<button id="expire_subscription_<?php echo $item_id;?>" name ="expire_subscription_<?php echo $item_id;?>" value="expire_subscription_<?php echo $item_id;?>" class="button-primary" <?php if ( $subscription_status == 'expired' ) echo 'disabled="disabled"';?> onclick="if ( confirm('<?php echo esc_js(sprintf(__("You are about to expire this subscription '%s'\n  'Cancel' to stop, 'OK' to expire subscription."), $post_name )); ?>') ) {return true;}return false;">Cancel Subscription</button>
-						</div>
-					</td>
-				</tr>
-			</table>
-			<?php
-			}
+					
+					$( "#subscription_end_dtm_<?php echo $item_id;?>" ).datepicker( 'setDate', '<?php echo wc_get_order_item_meta($item_id,'_subscription_expiry_date');?>');
+				});
+				</script>
+				<input type="text" name="subscription_end_dtm_<?php echo $item_id;?>" id="subscription_end_dtm_<?php echo $item_id;?>" style="width:100px;border: 1px solid #DDD;">
+				</td>
+			</tr>
+			<tr>
+				<td colspan="4">
+				<input type="hidden" name="subscription_item_id_<?php echo $item_id;?>" id="subscription_item_id_<?php echo $item_id;?>" value="<?php echo $item_id;?>">
+				<button id="modify_subscription_period_<?php echo $item_id;?>" class="button-primary">Update Subscription</button>
+				<div id="expire-action" style="margin-top:10px">
+				<?php
+				global $post;
+				$post_id = $post->ID;
+				$post_name =  $_product->post->post_title;
+				$subscription_status = wc_get_order_item_meta($item_id, '_subscription_status');
+				?>
+				<button id="expire_subscription_<?php echo $item_id;?>" name ="expire_subscription_<?php echo $item_id;?>" value="expire_subscription_<?php echo $item_id;?>" class="button-primary" <?php if ( $subscription_status == 'expired' ) echo 'disabled="disabled"';?> onclick="if ( confirm('<?php echo esc_js(sprintf(__("You are about to expire this subscription '%s'\n  'Cancel' to stop, 'OK' to expire subscription."), $post_name )); ?>') ) {return true;}return false;">Cancel Subscription</button>
+				</div>
+				</td>
+			</tr>
+		</table>
+		<?php
 		}
 	}
 }
@@ -75,14 +73,20 @@ function es_subscription_end_date_selector($item_id, $item, $_product) {
 add_action('woocommerce_process_shop_order_meta', 'es_modify_subscription_data', 9999, 2);
 
 function es_modify_subscription_data($post_id, $post) {
+	
+	$order = wc_get_order( $post->ID );
+	$items = $order->get_items(); 
 
-	//Check for which subscription button was pressed
-	foreach ($_POST['order_item_id'] as $item_id) {
-		$sub_button_name = 'subscription_item_id_'.$item_id;
+	foreach ( $items as $item ) {
+		$product_id = $item['product_id'];
+		$subscription_key = WC_Subscriptions_Manager::get_subscription_key( $post_id, $product_id );
+		$item_id = WC_Subscriptions_Order::get_item_id_by_subscription_key( $subscription_key );
+		$item    = WC_Subscriptions_Order::get_item_by_id( $item_id );
+		$sub_button_name = 'subscription_item_id_' . $item_id;
 		$expire_button_name = 'expire_subscription_' . $item_id;
 		
 		if(isset($_POST[$sub_button_name])) {
-			//subscription button pressed
+			// subscription button pressed
 			$end_dtm_input = 'subscription_end_dtm_'.$item_id;
 			$end_dtm = $_POST[$end_dtm_input];
 			$user_id = get_post_meta( $post_id, '_customer_user', true);
@@ -104,9 +108,8 @@ function es_modify_subscription_data($post_id, $post) {
 				$timePeriod = 'PT'.$hours.'H'.$mins.'M'.$seconds.'S';
 				$end_dtm_obj->add(new DateInterval($timePeriod));
 				
-				$subscription_key = WC_Subscriptions_Manager::get_subscription_key( $post_id, $item_id );
-				//WC_Subscriptions_Manager::update_users_subscriptions( $user_id, array('order_id' => $post_id, 'product_id' => $item_id, 'expiry_date' => $end_dtm) );
-				//WC_Subscriptions_Manager::update_subscription( $subscription_key, array( 'expiry_date' => $end_dtm ) );
+				// Updates a subscription's expiration date as scheduled in WP-Cron and in the subscription details array.
+				WC_Subscriptions_Manager::set_expiration_date( $subscription_key, $user_id, $end_dtm );
 			
 				//Calculate days difference
 				$interval = $start_dtm_obj->diff($end_dtm_obj);
@@ -118,18 +121,13 @@ function es_modify_subscription_data($post_id, $post) {
 					wc_update_order_item_meta( $item_id, '_subscription_period', 'day');
 					wc_update_order_item_meta( $item_id, '_subscription_expiry_date', $end_dtm_obj->format('Y-m-d H:i:s'));
 				}
-				
-				//$response = WC_Subscriptions_Manager::update_next_payment_date($end_dtm_obj->format('Y-m-d H:i:s'), $subscription_key, $user_id);
-				WC_Subscriptions_Manager::set_next_payment_date($subscription_key, $user_id, $end_dtm_obj->format('Y-m-d H:i:s'));
-				$next_payment_timestamp = WC_Subscriptions_Manager::get_next_payment_date( $subscription_key, $user_id, 'timestamp' );
 			}
 		}
 		
 		if( isset($_POST[$expire_button_name]) ) {
-			$datetime_now = new DateTime();
-			wc_update_order_item_meta( $item_id, '_subscription_expiry_date', $datetime_now->format('Y-m-d H:i:s'));
-			wc_update_order_item_meta( $item_id, '_subscription_status', 'expired');
-			
+			// expire subscription button pressed
+			WC_Subscriptions_Manager::expire_subscription( $user_id, $subscription_key );
+
 			$order = new WC_Order($post_id);
 			$order->add_order_note('Subscription cancelled', 0, true);
 		}
