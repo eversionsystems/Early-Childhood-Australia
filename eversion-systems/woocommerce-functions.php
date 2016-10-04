@@ -693,17 +693,81 @@ function es_woocommerce_admin_save_non_simple_custom_product_fields($post_id) {
 	}
 }
 
+add_filter( 'woocommerce_get_sale_price', 'es_set_sale_price', 9, 2 );
+add_filter( 'woocommerce_get_price', 'es_set_sale_price', 9, 2 );
+add_action( 'wp_footer', 'es_sale_notice' );
+
 /**
-* Modify prices in front end catalogue
+* Display sale notice at top of site.
 */
+function es_sale_notice() {
+	$date_now = new DateTime();
+	$start_dtm = new DateTime( '2016-10-03' );
+	$end_dtm = new DateTime( '2016-10-11' );
+	
+	if ( $date_now >= $start_dtm AND $date_now <= $end_dtm )
+		echo apply_filters( 'woocommerce_demo_store', '<p class="demo_store">The ECA National Conference Sale! Offer ends 11 October. Terms and conditions apply.</p>'  );
+}
+
+/**
+* Override prices with 10% off store wide.
+*/
+function es_set_sale_price( $price, $product ) {
+	
+	$exclude_skus = array( 'COEBRCE', 'COEPOSTER', 'PUB41' );
+	$exclude_cats = array( 'specials', 'clearance' );
+	$date_now = new DateTime();
+	$start_dtm = new DateTime( '2016-10-03' );
+	$end_dtm = new DateTime( '2016-10-11' );
+	
+	// exclude SKUs
+	if ( in_array( $product->sku, $exclude_skus ) )
+		return $price;
+	
+	// exclude specials category
+	$product_cat = wp_get_post_terms( $product->id, 'product_cat' );
+	
+	foreach ( $product_cat as $term ){
+		if( in_array( $term->slug, $exclude_cats ) ){
+			return $price;
+		}
+	}	
+	
+	if ( ! $product->is_virtual() AND ( $date_now >= $start_dtm AND $date_now <= $end_dtm ) ) {
+		$member_exists = es_check_membership_held();
+		$member_price = get_post_meta($product->id, 'member_price', true);
+		$price = $product->get_regular_price() * ( 0.9 );
+		
+		if ( ! empty( $member_price ) AND $member_exists ) {
+			$product->set_price( $member_price );
+			$product->sale_price = $price;
+			$price = $member_price;		
+		}
+		else {
+			$product->set_price( $price );
+			$product->sale_price = $price;	
+		}
+		
+	}
+	
+	return $price;
+}
+
+/**
+ * Display custom pricing in admin screens and frontend.
+ *
+ * @param string $price
+ * @param array $product
+ */
 add_filter( 'woocommerce_get_price_html', 'es_override_product_price', 11, 2 );
 
 function es_override_product_price($price, $product) {
 
-	if(!empty($product) && !is_admin()) {
+	if ( ! empty( $product ) AND ! is_admin() ) {
 		$display_price         = $product->get_display_price();
 		$display_regular_price = $product->get_display_price( $product->get_regular_price() );
 		$sale_price = $product->sale_price;
+		
 		//Check if logged in user is a member
 		$member_exists = es_check_membership_held();
 		//Check for membership price
@@ -725,16 +789,16 @@ function es_override_product_price($price, $product) {
 		if($product->get_price() > 0) {
 
 			if($product->is_on_sale() && $member_exists && $member_price > 0)
-				$price .= '<ins style="display: block;color:#ed1b24">'.wc_price( $sale_price ).$product->get_price_suffix().' Sale Price</ins>';
+				$price .= '<ins style="display: block;">'.wc_price( $sale_price ).$product->get_price_suffix().' Sale Price</ins>';
 			elseif($product->is_on_sale() && !$member_exists)
-				$price .= '<ins style="display: block;color:#ed1b24">'.wc_price( $sale_price ).$product->get_price_suffix().' Sale Price <i class="fa fa-check"></i></ins>';
+				$price .= '<ins style="display: block;">'.wc_price( $sale_price ).$product->get_price_suffix().' Sale Price <i class="fa fa-check"></i></ins>';
 			elseif($product->is_on_sale() && $member_exists && empty($member_price))
-				$price .= '<ins style="display: block;color:#ed1b24">'.wc_price( $sale_price ).$product->get_price_suffix().' Sale Price <i class="fa fa-check"></i></ins>';
+				$price .= '<ins style="display: block;">'.wc_price( $sale_price ).$product->get_price_suffix().' Sale Price <i class="fa fa-check"></i></ins>';
 			
 			if($member_price > 0 && $member_exists)
-				$price .= '<ins style="display: block;color:#67bd47">'.wc_price( $member_price ).$product->get_price_suffix().' Member Price <i class="fa fa-check"></i></ins>';
+				$price .= '<ins style="display: block;color:#77A464">'.wc_price( $member_price ).$product->get_price_suffix().' Member Price <i class="fa fa-check"></i></ins>';
 			elseif ($member_price > 0)
-				$price .= '<ins style="display: block;color:#67bd47">'.wc_price( $member_price ).$product->get_price_suffix().' Member Price</ins>';
+				$price .= '<ins style="display: block;color:#77A464">'.wc_price( $member_price ).$product->get_price_suffix().' Member Price</ins>';
 			
 		} elseif ( $product->get_price() == 0 ) {
 
@@ -758,9 +822,6 @@ function es_override_product_price($price, $product) {
 		
 		if( $product->get_price() > 0 ) {
 
-			//if( $product->is_on_sale() && $member_exists && $member_price > 0 )
-				//$price .= '<span style="display: block;">'.wc_price( $sale_price ).$product->get_price_suffix().' Sale Price</span>';
-			
 			if ( $member_price > 0 )
 				$price .= '<span style="display: block;color:#77A464">'.wc_price( $member_price ).$product->get_price_suffix().' Member Price</span>';
 
