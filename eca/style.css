@@ -2367,3 +2367,32 @@ div[itemprop="address"] {
         padding: 0 0 10px 0;
     }
 }
+
+/**
+* Store Notice text
+*/
+@media screen and ( min-width: 780px ) {
+	#eca-page {
+		margin-top:40px !important;
+	}
+	.admin-bar p.demo_store {
+		top: 32px;
+	}
+}
+
+@media screen and ( max-width: 780px ) {
+	.admin-bar p.demo_store {
+		top: 0px;
+	}
+}
+
+@media all and (min-width: 600px) and (max-width: 780px) {
+	.admin-bar p.demo_store {
+		top: 40px;
+	}
+}
+
+p.demo_store {
+	color:#FFF !important;
+	background-color:#c44e1a !important;
+}

@@ -61,7 +61,7 @@ add_action( 'after_setup_theme', 'eca_setup' );
 function eca_scripts() {
 	// Load our main stylesheet.
 	wp_enqueue_style( 'eca-jquery-ui', get_template_directory_uri() . '/jquery-ui.css', array() );
-	wp_enqueue_style( 'eca-style', get_stylesheet_uri(), array() );
+	wp_enqueue_style( 'eca-style', get_stylesheet_uri(), array(), '1.0.6' );
 	
 	// Load our main scripts
 	wp_enqueue_script( 'jquery' );
