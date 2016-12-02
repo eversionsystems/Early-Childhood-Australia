@@ -674,9 +674,11 @@ function es_show_member_price($thepostid) {
 add_action( 'woocommerce_process_product_meta_simple', 'es_woocommerce_admin_save_custom_product_fields');
 
 function es_woocommerce_admin_save_custom_product_fields($post_id) {
-	
-	if (!empty($_POST['member_price'])) {
-		update_post_meta($post_id, 'member_price', $_POST['member_price']);
+	if ( ! empty( $_POST['member_price'] ) ) {
+		update_post_meta( $post_id, 'member_price', $_POST['member_price'] );
+	}
+	else {
+		delete_post_meta( $post_id, 'member_price' );
 	}
 }
 
