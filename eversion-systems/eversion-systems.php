@@ -16,7 +16,8 @@ include 'profile-extra-meta-fields.php';	//Fields to display in admin panel
 include 'shortcodes.php';	//Various shortcodes
 include 'woocommerce-functions.php';	//Woocommerce additional functions
 include 'lib/meta-box.php';		//Xero custom fields
-include 'add-comment-packing-slip.php';	//Packing slip comment adding and custom order view columns
+// Packing slips plugin now handles these extra columns
+//include 'add-comment-packing-slip.php';	//Packing slip comment adding and custom order view columns
 include 'event-espresso-functions.php';	//Event Espresso
 include 'woocommerce-subscriptions.php';	//Custom WooCommerce Subscription functions
 
