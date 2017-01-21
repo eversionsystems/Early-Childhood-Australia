@@ -14,7 +14,13 @@
 * Load scripts (and/or styles) for specific pages
 */
 function eca_manage_woocommerce_styles(){
+
+	//global $post;
+	//$slug = get_post( $post )->post_name;
+
+	//if($slug == 'my-account'){
 	wp_enqueue_style('eca-woocommerce-custom', constant( 'EVERSION_PLUGIN_URL' ).'/woocommerce-custom.css', '', '1.01');
+	//}
 }
 
 //Set to 999 precedence so it loads css last
@@ -247,9 +253,9 @@ function woo_custom_hide_sales_flash()
 *
 */
 
-//function woocommerce_output_related_products() {
-	//woocommerce_related_products(4,1); // Display 4 products in rows of 2
-//}
+function woocommerce_output_related_products() {
+	woocommerce_related_products(4,1); // Display 4 products in rows of 2
+}
 
 /**
 * Add a $30/$23 surcharge to your cart / checkout based on delivery country for memberships/subscriptions
@@ -683,38 +689,31 @@ function es_woocommerce_admin_save_custom_product_fields($post_id) {
 add_action( 'woocommerce_process_product_meta', 'es_woocommerce_admin_save_non_simple_custom_product_fields');
 
 function es_woocommerce_admin_save_non_simple_custom_product_fields($post_id) {
+	
 	if (!empty($_POST['member_price'])) {
 		update_post_meta($post_id, 'member_price', $_POST['member_price']);
 	}
-}
-
-//add_filter('body_class', 'es_body_classes');
-
-function es_body_classes($classes) {
-	//$id = get_current_blog_id();
-	//$slug = strtolower(str_replace(' ', '-', trim(get_bloginfo('name'))));
-	//$classes[] = $slug;
-	
-	if ( is_store_notice_showing() )
-		$classes[] = 'es-store-notice';
-	
-	return $classes;
 }
 
 add_filter( 'woocommerce_get_sale_price', 'es_set_sale_price', 9, 2 );
 add_filter( 'woocommerce_get_price', 'es_set_sale_price', 9, 2 );
 add_action( 'wp_footer', 'es_sale_notice' );
 
+/**
+* Display sale notice at top of site.
+*/
 function es_sale_notice() {
 	$date_now = new DateTime();
-	$start_dtm = new DateTime( '2016-09-29' );
+	$start_dtm = new DateTime( '2016-10-03' );
 	$end_dtm = new DateTime( '2016-10-11' );
 	
-	if ( $date_now > $start_dtm AND $date_now < $end_dtm )
+	if ( $date_now >= $start_dtm AND $date_now <= $end_dtm )
 		echo apply_filters( 'woocommerce_demo_store', '<p class="demo_store">The ECA National Conference Sale! Offer ends 11 October. Terms and conditions apply.</p>'  );
 }
 
-
+/**
+* Override prices with 10% off store wide.
+*/
 function es_set_sale_price( $price, $product ) {
 	
 	$exclude_skus = array( 'COEBRCE', 'COEPOSTER', 'PUB41' );
@@ -722,7 +721,6 @@ function es_set_sale_price( $price, $product ) {
 	$date_now = new DateTime();
 	$start_dtm = new DateTime( '2016-10-03' );
 	$end_dtm = new DateTime( '2016-10-11' );
-	//4 Oct - 11th Oct
 	
 	// exclude SKUs
 	if ( in_array( $product->sku, $exclude_skus ) )
@@ -745,8 +743,7 @@ function es_set_sale_price( $price, $product ) {
 		if ( ! empty( $member_price ) AND $member_exists ) {
 			$product->set_price( $member_price );
 			$product->sale_price = $price;
-			$price = $member_price;			
-			write_log('Mmeber price = ' . $price);
+			$price = $member_price;		
 		}
 		else {
 			$product->set_price( $price );
@@ -778,14 +775,6 @@ function es_override_product_price($price, $product) {
 		//Check for membership price
 		$member_price = get_post_meta($product->id, 'member_price', true);
 		
-		//$sale_price = $product->get_regular_price() - ( $product->get_regular_price() * ( 0.1 ) );
-		//$product->set_price( $sale_price );
-		//echo $product->get_price();
-		//echo $sale_price;
-		//echo '<pre>';
-		//print_r($product);
-		//echo '</pre>';
-		
 		if($product->is_on_sale() && $member_exists && $member_price > 0)
 			$price = '<ins style="display: block;color:#000">'.wc_price($product->get_regular_price()).$product->get_price_suffix().'</ins>';
 		elseif($product->is_on_sale() && !$member_exists)
@@ -813,19 +802,6 @@ function es_override_product_price($price, $product) {
 			elseif ($member_price > 0)
 				$price .= '<ins style="display: block;color:#77A464">'.wc_price( $member_price ).$product->get_price_suffix().' Member Price</ins>';
 			
-			/*
-			if($product->get_regular_price() && $member_price > 0 && $member_exists) {
-				if ($display_price > $member_price)
-					$price .= $product->get_price_html_from_to( $display_regular_price, $product->get_display_price($member_price) ) . $product->get_price_suffix() . ' Member Price';
-				else
-					$price .= $product->get_price_html_from_to( $display_regular_price, $display_price ) . $product->get_price_suffix() . ' Sale Price';
-			}
-			elseif ( $product->is_on_sale() && $product->get_regular_price() ) {
-				$price .= $product->get_price_html_from_to( $display_regular_price, $display_price ) . $product->get_price_suffix() . ' Sale Price';
-			}
-			else {
-				$price .= wc_price( $display_price ) . $product->get_price_suffix();
-			}*/
 		} elseif ( $product->get_price() == 0 ) {
 
 			if ( $product->is_on_sale() && $product->get_regular_price() ) {
@@ -848,9 +824,6 @@ function es_override_product_price($price, $product) {
 		
 		if( $product->get_price() > 0 ) {
 
-			//if( $product->is_on_sale() && $member_exists && $member_price > 0 )
-				//$price .= '<span style="display: block;">'.wc_price( $sale_price ).$product->get_price_suffix().' Sale Price</span>';
-			
 			if ( $member_price > 0 )
 				$price .= '<span style="display: block;color:#77A464">'.wc_price( $member_price ).$product->get_price_suffix().' Member Price</span>';
 
@@ -868,9 +841,8 @@ function es_override_product_price($price, $product) {
 	return  $price;
 }
 
-
 /*
-* Issue here remove this code
+* Issue here remove this code - AS 19/07/2016
 */
 //add_filter('woocommerce_cart_item_subtotal', 'es_set_cart_product_subtotal', 20, 3);
 
@@ -976,8 +948,8 @@ function es_product_bulk_price($price, $quantity, $sku) {
 			$price = 19.95;
 	}
 	elseif($sku == 'SUND621') {
-		if ($quantity >= 5)
-			$price = 24.95;
+		if ($quantity >= 3)
+			$price = 19.95;
 	}
 	elseif($sku == 'SUND620') {
 		if ($quantity >= 5)
@@ -990,7 +962,7 @@ function es_product_bulk_price($price, $quantity, $sku) {
 /**
  * woocommerce_package_rates is a 2.1+ hook
  */
-add_filter( 'woocommerce_package_rates', 'es_free_shipping_promotion', 10, 2 );
+add_filter( 'woocommerce_package_rates', 'hide_shipping_when_free_is_available', 10, 2 );
  
 /**
  * Hide shipping rates when free shipping is available
@@ -999,7 +971,7 @@ add_filter( 'woocommerce_package_rates', 'es_free_shipping_promotion', 10, 2 );
  * @param array $package The package array/object being shipped
  * @return array of modified rates
  */
-function es_free_shipping_promotion( $rates, $package ) {
+function hide_shipping_when_free_is_available( $rates, $package ) {
  	
  	global $woocommerce;
 	
@@ -1137,7 +1109,6 @@ add_filter( 'loop_shop_per_page', create_function( '$cols', 'return 16;' ), 20 )
 /**
 * Filters the $order->get_items() method results to order all line items by product name
 */
-
 add_filter( 'woocommerce_order_get_items', function( $items, $order ) {
  
 	uasort( $items, 
@@ -1293,7 +1264,7 @@ function es_add_catalog_order_by_member_prices($catalog_orderby_options) {
 	
 	//Remove specific sorting options
 	unset($catalog_orderby_options["rating"]);
-	
+
 	$catalog_orderby_options['member_price'] = __( 'Sort by member price', 'woocommerce' );
 	
 	return $catalog_orderby_options;
@@ -1516,25 +1487,12 @@ function sv_wc_pip_document_sort_order_items_key( $sort_by, $order_id, $type ) {
 
 add_filter( 'wc_pip_document_sort_order_items_key', 'sv_wc_pip_document_sort_order_items_key', 10, 3 );
 
-/*
-apply_filters( 'wc_pip_packing_list_group_items_by_category', 'es_wc_pip_packing_list_group_items_by_category', 10, 2 );
-
-function es_wc_pip_packing_list_group_items_by_category( $order_id, $type ) {
-	return false;
-}
-
-add_filter ( 'wc_pip_document_sort_order_items_alphabetically', 'es_document_sort_order_items_alphabetically', 10, 2 );
-
-function es_document_sort_order_items_alphabetically ( $order_id, $type ) {
-	return false;
-}
-*/
-
 /**
  * Removes packing list / pick list sorting by category and
  *   outputs line items in alphabetical order
  */
 add_filter( 'wc_pip_packing_list_group_items_by_category', '__return_false' );
+
 /**
  * Example: Remove product grouping if an order is not yet paid. (WC 2.5+)
  * Only removes grouping for pick lists
@@ -1557,47 +1515,6 @@ function sv_wc_pip_packing_list_grouping( $group_items, $order_id, $document_typ
 	return $group_items;
 }
 add_filter( 'wc_pip_packing_list_group_items_by_category', 'sv_wc_pip_packing_list_grouping', 10, 3 );
-
- 
-/*
-add_filter( 'wpo_wcpdf_order_items_data', 'wpo_wcpdf_sort_items_by_sku', 10, 2 );
-
-function wpo_wcpdf_sort_items_by_sku ( $items, $order ) {
-    usort($items, 'wpo_wcpdf_sort_by_sku');
-    return $items;
-}
-
-function wpo_wcpdf_sort_by_sku($a, $b) {
-    if (!isset($a['sku'])) $a['sku'] = '';
-    if (!isset($b['sku'])) $b['sku'] = '';
-    if ($a['sku'] == $b['sku']) return 0;
-    return ($a['sku'] < $b['sku'])?-1:1;
-}*/
-
-/**
- * Remove filters from WooCommerce products page.
- *
- */
-add_action( 'admin_init', 'es_remove_yoast_filter_dropdown', 20 );
-
-function es_remove_yoast_filter_dropdown() {
-	global $wpseo_meta_columns‌;
-
-    if ( $wpseo_meta_columns‌ ) {
-        remove_action( 'restrict_manage_posts', array( $wpseo_meta_columns‌, 'posts_filter_dropdown' ) );
-    }
-}
-
-add_action( 'admin_init', 'es_admin_init_remove_filters', 20 );
-
-function es_admin_init_remove_filters() {
-	global $Groups_Admin_Posts;
-	
-	if ( $Groups_Admin_Posts ) {
-		remove_action( 'restrict_manage_posts', array( $Groups_Admin_Posts, 'restrict_manage_posts' ) );
-		//remove_action( 'restrict_manage_posts', array( 'Groups_Admin_Posts', 'restrict_manage_posts' ) );
-	}
-}
 
 /**
  * Modify the header for packing slips.
