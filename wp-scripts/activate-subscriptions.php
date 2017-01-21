@@ -7,23 +7,36 @@
  */
 //require_once( dirname(__FILE__) . '/wp-load.php');
 //require_once( dirname(__FILE__) . '/wp-content/plugins/woocommerce-subscriptions/woocommerce-subscriptions.php' );
+//$root = realpath($_SERVER["DOCUMENT_ROOT"]);
+//require_once( "$root/webfiles/shop/wp-load.php");
+//require_once( "$root/webfiles/shop/wp-content/plugins/woocommerce-subscriptions/woocommerce-subscriptions.php" );
+set_time_limit(300);
 require_once( '../wp-load.php');
 require_once( '../wp-content/plugins/woocommerce-subscriptions/woocommerce-subscriptions.php' );
 
-$sub_keys = array ( );
+// subscription key is the $order_id . '_' . $product_id;
+$sub_keys = array (  );
 
 foreach( $sub_keys as $subscription_key ) {
 	// setup the active subscription parameters
 	$new_subscription_details = array( 'status' => 'active', 'end_date' => '' );
 	
 	$subscription = WC_Subscriptions_Manager::update_subscription( $subscription_key, $new_subscription_details );
+	//echo '<pre>';
+	//print_r($subscription);
+	//echo '</pre>';
 	$user_id = WC_Subscriptions_Manager::get_user_id_from_subscription_key( $subscription_key );
+	//print_r($user_id);
 	
 	// ensure a new cron job to expire the subscription exists
-	WC_Subscriptions_Manager::set_expiration_date( $subscription_key, $user_id, $subscription['expiry_date'] );
+	$cron = WC_Subscriptions_Manager::set_expiration_date( $subscription_key, $user_id, $subscription['expiry_date'] );
+	//print_r($cron);
 	
-	echo 'Processed Subscription ' . $subscription_key . '<br>';
+	//$count++;
+	//echo 'Processed Subscription ' . $subscription_key . '<br>';
 }
+
+echo 'Complete';
 
 /*
 $new_subscription_details = array( 'status' => 'active', 'end_date' => '' );
@@ -71,17 +84,5 @@ calculate_subscription_expiration_date( $subscription_key, $user_id = '', $type 
 set_expiration_date( $subscription_key, $user_id = '', $expiration_date = '' )
 get_user_id_from_subscription_key( $subscription_key )
 */
-
-if (!function_exists('write_log')) {
-    function write_log ( $log )  {
-        if ( true === WP_DEBUG ) {
-            if ( is_array( $log ) || is_object( $log ) ) {
-                error_log( print_r( $log, true ) );
-            } else {
-                error_log( $log );
-            }
-        }
-    }
-}
 
 ?> 
