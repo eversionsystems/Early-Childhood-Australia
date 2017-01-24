@@ -1532,4 +1532,99 @@ function es_woocommerce_adjust_packing_slip_heading( $heading, $type, $action, $
 	return $heading;
 }
 
+/**
+ *Reduce the strength requirement on the woocommerce password.
+ *
+ * Strength Settings
+ * 3 = Strong (default)
+ * 2 = Medium
+ * 1 = Weak
+ * 0 = Very Weak / Anything
+ *
+ * @link	https://wordpress.org/support/topic/woocommerce-password-strength-meter-too-high/page/2/
+ */
+function reduce_woocommerce_min_strength_requirement( $strength ) {
+    return 2;
+}
+
+add_filter( 'woocommerce_min_password_strength', 'reduce_woocommerce_min_strength_requirement' );
+
+/**
+ * Change display text of password meter
+ *
+ * @link	https://nicola.blog/2016/02/16/change-the-password-strength-meter-labels/
+ */
+function my_strength_meter_custom_strings( $data ) {
+    $data_new = array(
+        'i18n_password_error'   => esc_attr__( 'Please enter a stronger password.', 'eversion-systems' ),
+        'i18n_password_hint'    => esc_attr__( 'Your password must be at least <strong>MEDIUM</strong> strength. To achieve this, it must contain a mixture of <strong>UPPER</strong> and <strong>lowercase</strong> letters, <strong>numbers</strong>, and <strong>symbols</strong> (e.g., <strong> ! " ? $ % ^ & </strong>). Keep adding additional characters and/or variations until a medium strength is achieved.', 'eversion-systems' )
+    );
+
+    return array_merge( $data, $data_new );
+}
+
+add_filter( 'wc_password_strength_meter_params', 'my_strength_meter_custom_strings' );
+
+/**
+ * Add a custom column to WooCommerce products quick edit.
+ *
+ */
+function es_display_custom_quickedit_product() {
+    ?>
+	<br class="clear" />
+	<h4>Custom Fields</h4>
+	<label>
+		<span class="title"><?php _e( 'Member Price', 'woocommerce' ); ?></span>
+		<span class="input-text-wrap">
+			<input type="text" name="member_price" class="text wc_input_price" value="">
+		</span>
+	</label>
+	<br class="clear" />
+    <?php
+}
+
+add_action( 'woocommerce_product_quick_edit_end', 'es_display_custom_quickedit_product' );
+
+/**
+ * Save the quick edit custom WooCommerce fields
+ *
+ * @link	https://wpdreamer.com/2012/03/manage-wordpress-posts-using-bulk-edit-and-quick-edit/#populate_quick_edit
+ */
+function es_save_custom_quickedit_product( $product ) {
+	if ( isset( $_REQUEST['member_price'] ) ) {
+		update_post_meta( $product->id, 'member_price', wc_clean( $_REQUEST['member_price'] ) );
+	}
+}
+
+add_action( 'woocommerce_product_quick_edit_save', 'es_save_custom_quickedit_product' );
+
+/**
+ * Add a member price column for WooCommerce products
+ *
+ */
+function es_managing_custom_product_columns( $columns, $post_type ) {
+   if ( $post_type == 'product' )
+      $columns[ 'member_price' ] = 'Member Price';
+   return $columns;
+}
+
+add_filter( 'manage_posts_columns', 'es_managing_custom_product_columns', 10, 2 );
+
+/**
+ * Populate the custom WooCommerce columns with data.
+ *
+ */
+function es_populating_custom_product_columns( $column_name, $post_id ) {
+   switch( $column_name ) {
+      case 'member_price':
+		$member_price = get_post_meta( $post_id, 'member_price', true );
+		if( $member_price > 0 )
+			echo '<div id="member_price-' . $post_id . '" data-price="' . $member_price . '">'  . wc_price( $member_price ) . '</div>';
+        
+		break;
+   }
+}
+
+add_action( 'manage_product_posts_custom_column', 'es_populating_custom_product_columns', 10, 2 );
+
 ?>

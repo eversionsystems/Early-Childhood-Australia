@@ -59,6 +59,13 @@ function es_admin_enqueue_scripts($hook) {
 		//Duplicate Billing to Shipping Address
 		wp_enqueue_script( 'dashboard-duplicate-bill-address', constant( 'EVERSION_PLUGIN_URL' ). 'js/admin-duplicate-billing-address.js', array( 'jquery' ), '1.0', false );
 	}
+	
+	/**
+	 * We need this script in order to populate quick edit fields.
+	 */
+	if ( 'edit.php' === $hook && isset( $_GET['post_type'] ) && 'product' === $_GET['post_type'] ) {
+		wp_enqueue_script('es-woo-quick-edit-script', EVERSION_PLUGIN_URL . '/js/eversion-woocommerce-quick-edit.js', array('jquery','inline-edit-post' ), '', true );
+	}
 }
 
 /**
