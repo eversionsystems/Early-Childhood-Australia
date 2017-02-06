@@ -40,6 +40,12 @@ class ECA_Bulk_Product_Prices_Public {
 	 */
 	private $version;
 	
+	public $coebrce;
+	public $pub44;
+	public $bulk_skus;
+	public $coebrce_quantities;
+	public $pub44_quantities;
+	
 	/**
 	 * Store all the bulk prices/quantities.
 	 *
@@ -48,6 +54,8 @@ class ECA_Bulk_Product_Prices_Public {
 	 * @var      array    $bulk_prices    Store all the bulk prices/quantities.
 	 */
 	protected $bulk_prices;
+	
+	protected $bulk_prices_pub44;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -61,6 +69,12 @@ class ECA_Bulk_Product_Prices_Public {
 		$this->ECA_Bulk_Product_Prices = $ECA_Bulk_Product_Prices;
 		$this->version = $version;
 		
+		$this->pub44 = 'PUB44';
+		$this->coebrce = 'COEBRCE';
+		$this->coebrce_quantities = array( '10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '200', '300', '400', '500', '600', '700', '800' );
+		$this->pub44_quantities = array( '10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '150', '175', '200' );
+		$this->bulk_skus = array( $this->coebrce, $this->pub44 );
+		
 		$this->bulk_prices = array (
 				array(10,9,10),
 				array(20, 10.10, 11.1),
@@ -73,13 +87,31 @@ class ECA_Bulk_Product_Prices_Public {
 				array(90, 26, 28.6),
 				array(100, 28.7, 31.55),
 				array(200, 44.5, 49),
-				array(300, 60.75, 66.9),
-				array(400, 77.92, 85.72),
-				array(500, 93.35, 102.65),
-				array(600, 108.78, 119.58),
-				array(700, 124.6, 137.2),
-				array(800, 152, 167.2)
+				array(300, 60.75, 66.85),
+				array(400, 77.9, 85.7),
+				array(500, 93.3, 102.65),
+				array(600, 108.75, 119.6),
+				array(700, 124.6, 137),
+				array(800, 151.95, 167.15)
 			);
+		
+		$this->bulk_prices_pub44 = array (
+				array(10, 27, 32),
+				array(20, 42, 52),
+				array(30, 59, 74),
+				array(40, 73, 93),
+				array(50, 88, 113),
+				array(60, 105, 135),
+				array(70, 119, 154),
+				array(80, 134, 174),
+				array(90, 150, 195),
+				array(100, 167, 217),
+				array(150, 240, 315),
+				array(175, 279, 367),
+				array(200, 318, 418),
+			);
+			
+		
 	}
 
 	/**
@@ -130,32 +162,37 @@ class ECA_Bulk_Product_Prices_Public {
 
 			$items = $woocommerce->cart->get_cart();
 			$quantity = 0;
-			 
+			
 			foreach ( $items as $key => $values ) {
-				if($values['data']->get_sku() == 'COEBRCE') {
+				if( in_array( $values['data']->get_sku(), $this->bulk_skus )    ) {
 					$quantity = $values['quantity'];
 					$member_exists = es_check_membership_held();
 					break;
 				}
 			}
-			 
-			$object_array = array(
-				'prices' => $this->bulk_prices,
-				'is_member' => es_check_membership_held(),
-				'selected_quantity' => $quantity,
-				'product_slug' => $product
-			);
 			
-			//write_log($product);
-		
-			//if($product->get_sku() == 'COEBRCE') {
-		
-				wp_register_script( $this->ECA_Bulk_Product_Prices, plugin_dir_url( __FILE__ ) . 'js/eca-bulk-product-prices-public.js', array( 'jquery' ), self::script_version_id(), false );
-				wp_localize_script( $this->ECA_Bulk_Product_Prices, 'bulk_prices', $object_array ); 
-				wp_enqueue_script( $this->ECA_Bulk_Product_Prices );
-				//http://openexchangerates.github.io/accounting.js/
-				wp_enqueue_script( 'accounting', plugin_dir_url( __FILE__ ) . 'js/accounting.min.js', array( 'jquery' ), self::script_version_id(), false );
-			//}
+			if( $product->get_sku() == $this->coebrce ) {
+				$object_array = array(
+					'prices' => $this->bulk_prices,
+					'is_member' => es_check_membership_held(),
+					'selected_quantity' => $quantity,
+					'product_slug' => $product
+				);
+			}
+			elseif ( $product->get_sku() == $this->pub44 ) {
+				$object_array = array(
+					'prices' => $this->bulk_prices_pub44,
+					'is_member' => es_check_membership_held(),
+					'selected_quantity' => $quantity,
+					'product_slug' => $product
+				);
+			}
+			
+			wp_register_script( $this->ECA_Bulk_Product_Prices, plugin_dir_url( __FILE__ ) . 'js/eca-bulk-product-prices-public.js', array( 'jquery' ), self::script_version_id(), false );
+			wp_localize_script( $this->ECA_Bulk_Product_Prices, 'bulk_prices', $object_array ); 
+			wp_enqueue_script( $this->ECA_Bulk_Product_Prices );
+			//http://openexchangerates.github.io/accounting.js/
+			wp_enqueue_script( 'accounting', plugin_dir_url( __FILE__ ) . 'js/accounting.min.js', array( 'jquery' ), self::script_version_id(), false );
 		}
 	}
 	
@@ -203,14 +240,15 @@ class ECA_Bulk_Product_Prices_Public {
 		// Don't run this function on the checkout.  We have a gift plugin running that adds a free item to the cart when
 		// they are on the checkout page which causes issues with the get_sku() function
 		if ( ! is_checkout() ) {
-			if( $product->get_sku() == 'COEBRCE' ) {
-				if ( count($this->bulk_prices) > 0 ) {
+			if( in_array( $product->get_sku(), $this->bulk_skus ) ) {
+				$bulk_prices = self::get_bulk_prices_array( $product->get_sku() );
+				if ( count( $bulk_prices ) > 0 ) {
 					$member_exists = es_check_membership_held();
 					
 					if($member_exists)
-						return '<ins style="display: block;color:#000">From <span class="woocommerce-Price-amount amount">' . wc_price($this->bulk_prices[0][2]) . ' for ' . $this->bulk_prices[0][0] . '</span></ins><ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' . wc_price($this->bulk_prices[0][1]) . ' for ' . $this->bulk_prices[0][0] . '</span> Member Price <i class="fa fa-check"></i></ins>';
+						return '<ins style="display: block;color:#000">From <span class="woocommerce-Price-amount amount">' . wc_price($bulk_prices[0][2]) . ' for ' . $bulk_prices[0][0] . '</span></ins><ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' . wc_price($bulk_prices[0][1]) . ' for ' . $bulk_prices[0][0] . '</span> Member Price <i class="fa fa-check"></i></ins>';
 					else
-						return '<ins style="display: block;color:#000">From <span class="woocommerce-Price-amount amount">' . wc_price($this->bulk_prices[0][2]) . ' for ' . $this->bulk_prices[0][0] . '</span> <i class="fa fa-check"></i></ins><ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' . wc_price($this->bulk_prices[0][1]) . ' for ' . $this->bulk_prices[0][0] . '</span> Member Price</ins>';
+						return '<ins style="display: block;color:#000">From <span class="woocommerce-Price-amount amount">' . wc_price($bulk_prices[0][2]) . ' for ' . $bulk_prices[0][0] . '</span> <i class="fa fa-check"></i></ins><ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' . wc_price($bulk_prices[0][1]) . ' for ' . $bulk_prices[0][0] . '</span> Member Price</ins>';
 				}
 			}
 		}
@@ -225,7 +263,7 @@ class ECA_Bulk_Product_Prices_Public {
 	 */
 	public function product_attributes( $defaults, $product) {
 
-		if($product->get_sku() == 'COEBRCE') {
+		if( in_array( $product->get_sku(), $this->bulk_skus ) ) {
 			//$defaults['input_value'] = 10;
 			$defaults['min_value'] = 10;
 		}
@@ -244,11 +282,12 @@ class ECA_Bulk_Product_Prices_Public {
 	public function set_cart_item_product_price( $cart_object ) {
 		
 		foreach ( $cart_object->cart_contents as $key => $values ) {
-			if($values['data']->get_sku() == 'COEBRCE') {
+			if( in_array( $values['data']->get_sku(), $this->bulk_skus ) ) {
 				$quantity = $values['quantity'];
 				$member_exists = es_check_membership_held();
+				$bulk_prices = self::get_bulk_prices_array( $values['data']->get_sku() );
 				
-				foreach ($this->bulk_prices as $value) {
+				foreach ($bulk_prices as $value) {
 					if($value[0] == $quantity) {
 						if($member_exists)
 							$values['data']->price = $value[1] / $quantity;
@@ -274,8 +313,7 @@ class ECA_Bulk_Product_Prices_Public {
 		
 		$product_sku = $product->get_sku();
 		
-		if($product_sku == 'COEBRCE') {
-			
+		if( in_array( $product->get_sku(), $this->bulk_skus )  ) {
 			foreach($items as $cart_item_key => $values) { 
 
 				if(isset($values['product_id'])) {
@@ -314,7 +352,7 @@ class ECA_Bulk_Product_Prices_Public {
 		$items = $woocommerce->cart->get_cart();
 		$product_sku = $product->get_sku();
 		
-		if($product_sku == 'COEBRCE') {
+		if( in_array( $product->get_sku(), $this->bulk_skus )  ) {
 			foreach($items as $cart_item_key => $values) { 
 
 				if(isset($values['product_id'])) {
@@ -350,7 +388,7 @@ class ECA_Bulk_Product_Prices_Public {
 
 		$product_sku = $product->get_sku();
 
-		if($product_sku == 'COEBRCE') {
+		if( in_array( $product->get_sku(), $this->bulk_skus ) ) {
 			return sprintf( '<a rel="nofollow" href="%s" data-quantity="%s" data-product_id="%s" data-product_sku="%s" class="%s">%s</a>',
 				esc_url( $product->get_permalink() ),
 				esc_attr( isset( $quantity ) ? $quantity : 1 ),
@@ -374,9 +412,8 @@ class ECA_Bulk_Product_Prices_Public {
 		global $product;	//Returns slug of product
 		
 		$product = new WC_Product($post->ID);
-		$sku = $product->get_sku();
-		
-		if($sku == 'COEBRCE') {
+
+		if( in_array( $product->get_sku(), $this->bulk_skus ) ) {
 			
 			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_title', 5 );
 			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_rating', 10 );
@@ -404,7 +441,8 @@ class ECA_Bulk_Product_Prices_Public {
 		
 		$product_sku = $product->get_sku();
 
-		if($product_sku == 'COEBRCE') {
+		if( in_array( $product_sku, $this->bulk_skus ) ) {
+			$bulk_prices = self::get_bulk_prices_array( $product_sku );
 		?>
 		<p id="eca-table-discounts-heading"><strong><a href="#"><i class="fa fa-expand" aria-hidden="true"></i> Show quantity discounts</a></strong></p>
 		<div class="eca-table-discounts-content" style="display:none;">
@@ -414,7 +452,7 @@ class ECA_Bulk_Product_Prices_Public {
 					<th>Member Price</th> 
 					<th>Non-Member Price</th>
 				</tr>
-				<?php foreach ($this->bulk_prices as $bulk_price) { ?>
+				<?php foreach ( $bulk_prices as $bulk_price ) { ?>
 				<tr>
 					<td><?php echo $bulk_price[0]; ?></td>
 					<td><?php echo wc_price($bulk_price[1]); ?></td>
@@ -425,6 +463,22 @@ class ECA_Bulk_Product_Prices_Public {
 		</div>
 		<?php		
 		}
+	}
+	
+	/**
+	 * Return an array of bulk prices for a specified SKU
+	 *
+	 * @since    1.0.0
+	 */
+	function get_bulk_prices_array( $product_sku ) {
+		if( $product_sku == $this->coebrce ) {
+			$bulk_prices = $this->bulk_prices;
+		}
+		elseif ( $product_sku == $this->pub44 ) {
+			$bulk_prices = $this->bulk_prices_pub44;
+		}
+		
+		return $bulk_prices;
 	}
 	
 	/**

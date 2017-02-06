@@ -33,7 +33,7 @@
 		var selectedValue = '';
 		
 		$(".quantity_select select").change(function() {
-			selectedValue = $( this ).val();
+			var selectedValue = $( this ).val();
 			
 			setSelectedPrice(selectedValue);
 		});
@@ -51,7 +51,7 @@
 		if(typeof (bulk_prices.product_slug) == 'object')
 			productSlug = bulk_prices.product_slug['post']['post_name'];
 		
-		if(productSlug == 'code-of-ethics-brochure')
+		if(productSlug == 'code-of-ethics-brochure' || productSlug == 'statement-inclusion-every-child-early-childhood-education-care' )
 			setSelectedPrice(selectedValue);
 		
 		function setSelectedPrice(selectedValue) {
@@ -65,7 +65,7 @@
 								'<ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' + accounting.formatMoney(bulk_prices.prices[i][1]) + '</span> Member Price <i class="fa fa-check"></i></ins>';
 					else
 						price = '<ins style="display: block;color:#000"><span class="woocommerce-Price-amount amount">' +  accounting.formatMoney(bulk_prices.prices[i][2]) + '</span> <i class="fa fa-check"></i></ins>' +
-								'<ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' + accounting.formatMoney(bulk_prices.prices[i][1]) + '</span> Member Price</ins>';;
+								'<ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' + accounting.formatMoney(bulk_prices.prices[i][1]) + '</span> Member Price</ins>';
 				}
 			}
 			

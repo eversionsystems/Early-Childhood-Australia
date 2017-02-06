@@ -69,7 +69,7 @@ class ECA_Bulk_Product_Prices {
 	public function __construct() {
 
 		$this->ECA_Bulk_Product_Prices = 'eca-bulk-product-prices';
-		$this->version = '1.0.2';
+		$this->version = '1.0.0';
 
 		$this->load_dependencies();
 		$this->set_locale();

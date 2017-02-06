@@ -9,7 +9,10 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-if ($sku == 'COEBRCE') {
+$eva_bulk_pp = new ECA_Bulk_Product_Prices_Public();
+//write_log($eva_bulk_pp->bulk_skus);
+
+if ( in_array( $sku, $eva_bulk_pp->bulk_skus ) ) {
 	
 	global $woocommerce;
 	$items = $woocommerce->cart->get_cart();
@@ -28,7 +31,10 @@ if ($sku == 'COEBRCE') {
 		<select name="<?php echo esc_attr( $input_name ); ?>" title="<?php _ex( 'Qty', 'Product quantity input tooltip', 'woocommerce' ) ?>" class="qty">
 		<?php
 		
-		$product_quantities = array('10', '20', '30', '40', '50', '60', '70', '80', '90', '100', '200', '300', '400', '500', '600', '700', '800');
+		if ( $sku == $eva_bulk_pp->coebrce )
+			$product_quantities = $eva_bulk_pp->coebrce_quantities;
+		elseif ( $sku == $eva_bulk_pp->pub44 )
+			$product_quantities = $eva_bulk_pp->pub44_quantities;
 		
 		foreach ( $product_quantities as $value) {
 			if ( $value == $input_value )
