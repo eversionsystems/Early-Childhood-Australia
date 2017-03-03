@@ -1,0 +1,163 @@
+/**
+* Name: user-edit-tabbed-admin.css
+* Purpose: CSS to style the TAB screen for user edit meta fields
+*/
+
+#wpfooter {
+	display:none
+}
+
+/**
+* Formatting fields
+*/
+
+.form-table td {
+    padding: 0px;
+}
+
+.form-table th {
+    padding: 10px 5px 10px 0px;
+}
+
+.hasDatepicker {
+	width:100px;
+}
+
+/**
+* Questions
+*/
+.two-columns {
+	-webkit-column-count:2; /* Chrome, Safari, Opera */
+	-moz-column-count:2; /* Firefox */
+	column-count:2;
+	-webkit-column-gap:10px; /* Chrome, Safari, Opera */
+	-moz-column-gap:10px; /* Firefox */
+	column-gap:10px;
+	vertical-align:middle;
+} 
+
+.two-columns  input{
+	float:left;
+	margin:5px;
+}
+
+.two-columns  label{
+	display: block;
+	padding: 6px 0px 5px 0px;
+} 
+
+/**
+* Header with customer number and new user button
+*/
+#user-edit-header {
+    display: table;
+    width: 50%;
+}
+#user-edit-header-leftcolumn {
+    display: table-cell;
+    width: 50%;
+    vertical-align: middle;
+}
+#user-edit-header-rightcolumn {
+    display: table-cell;
+    width: 50%;
+    vertical-align: middle;
+}
+
+/**
+* WooCommerce Subscription list
+*/
+
+.subscriptions  {
+	border-collapse: collapse;
+	margin-top: 0.5em;
+	width: 95%;
+	clear: both;
+	font-size: 14px;
+	line-height: 1.6em;
+}
+
+.subscriptions td {
+	padding: 5px;
+}
+
+.subscriptions th {
+	text-align: left;
+	padding: 5px;
+}
+
+.subscriptions tr  {
+   border: 1px solid #D0D0D0;
+} 
+
+/**
+* User Meta Fields
+*/
+
+.um_field_container {
+    margin: 0px !important;
+}
+
+#insert_user {
+	border-color: rgb(14, 57, 80);
+	box-shadow: 0px 1px 0px rgba(120, 200, 230, 0.6) inset, 1px 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Hide top label for profile */
+.pf_label {
+	display:none;
+}
+
+.form-table th {
+	vertical-align:middle;
+}
+
+/**
+* Phone number is only field using description
+*/
+.um_description {
+	display:inline;
+}
+
+/*
+* For file upload move description under field
+*/
+#um_field_37_profile_description {
+    display: block;
+}
+
+/**
+* User groups selectize
+*/
+
+.selectize-control {
+    position: relative;
+    width: 95%;
+}
+
+/**
+* Upload sizing
+*/
+.wp-admin input[type="file"] {
+    width: 400px;
+}
+
+/**
+* Fix issue with front end css formatting dashboard table fields incorrectly
+*/
+.form-row-last {
+    float: left;
+}
+
+/**
+* Radio button display inline in dashboard
+*/
+label[for=um_field_13_profile_0]
+{
+	display:inline-block;
+}
+
+label[for=um_field_13_profile_1]
+{
+	display:inline-block;
+}
