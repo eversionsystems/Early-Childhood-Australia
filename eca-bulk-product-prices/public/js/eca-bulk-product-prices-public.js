@@ -32,61 +32,62 @@
 	$(function() {
 		var selectedValue = '';
 		
-		$(".quantity_select select").change(function() {
-			var selectedValue = $( this ).val();
+		if ( bulk_prices != null ) {
+			$(".quantity_select select").change(function() {
+				var selectedValue = $( this ).val();
+				
+				setSelectedPrice(selectedValue);
+			});
 			
-			setSelectedPrice(selectedValue);
-		});
-		
-		//Default the price on load
-		var price = '';
-		
-		if ( bulk_prices.selected_quantity == 0 )
-			selectedValue = $("[name='quantity']").val();
-		else
-			selectedValue = bulk_prices.selected_quantity;
-		
-		var productSlug = '';
-		
-		if(typeof (bulk_prices.product_slug) == 'object')
-			productSlug = bulk_prices.product_slug['post']['post_name'];
-		
-		if(productSlug == 'code-of-ethics-brochure' || productSlug == 'statement-inclusion-every-child-early-childhood-education-care' )
-			setSelectedPrice(selectedValue);
-		
-		function setSelectedPrice(selectedValue) {
+			//Default the price on load
 			var price = '';
 			
-			for (var i = 0; i< bulk_prices.prices.length; i++) {
+			if ( bulk_prices.selected_quantity == 0 )
+				selectedValue = $("[name='quantity']").val();
+			else
+				selectedValue = bulk_prices.selected_quantity;
+			
+			var productSlug = '';
+			
+			if(typeof (bulk_prices.product_slug) == 'object')
+				productSlug = bulk_prices.product_slug['post']['post_name'];
+			
+			if(productSlug == 'code-of-ethics-brochure' || productSlug == 'statement-inclusion-every-child-early-childhood-education-care' )
+				setSelectedPrice(selectedValue);
+			
+			function setSelectedPrice(selectedValue) {
+				var price = '';
 				
-				if(bulk_prices.prices[i][0] == selectedValue) {
-					if( bulk_prices.is_member )
-						price = '<ins style="display: block;color:#000"><span class="woocommerce-Price-amount amount">' + accounting.formatMoney(bulk_prices.prices[i][2]) + '</span></ins>' +
-								'<ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' + accounting.formatMoney(bulk_prices.prices[i][1]) + '</span> Member Price <i class="fa fa-check"></i></ins>';
-					else
-						price = '<ins style="display: block;color:#000"><span class="woocommerce-Price-amount amount">' +  accounting.formatMoney(bulk_prices.prices[i][2]) + '</span> <i class="fa fa-check"></i></ins>' +
-								'<ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' + accounting.formatMoney(bulk_prices.prices[i][1]) + '</span> Member Price</ins>';
+				for (var i = 0; i< bulk_prices.prices.length; i++) {
+					
+					if(bulk_prices.prices[i][0] == selectedValue) {
+						if( bulk_prices.is_member )
+							price = '<ins style="display: block;color:#000"><span class="woocommerce-Price-amount amount">' + accounting.formatMoney(bulk_prices.prices[i][2]) + '</span></ins>' +
+									'<ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' + accounting.formatMoney(bulk_prices.prices[i][1]) + '</span> Member Price <i class="fa fa-check"></i></ins>';
+						else
+							price = '<ins style="display: block;color:#000"><span class="woocommerce-Price-amount amount">' +  accounting.formatMoney(bulk_prices.prices[i][2]) + '</span> <i class="fa fa-check"></i></ins>' +
+									'<ins style="display: block;color:#77A464"><span class="woocommerce-Price-amount amount">' + accounting.formatMoney(bulk_prices.prices[i][1]) + '</span> Member Price</ins>';
+					}
 				}
+				
+				//$( ".summary .price" ).text(accounting.formatMoney(price));
+				$( ".summary .price" ).html(price);
 			}
 			
-			//$( ".summary .price" ).text(accounting.formatMoney(price));
-			$( ".summary .price" ).html(price);
+			$('#eca-table-discounts-heading').click(function(event){
+				event.preventDefault();
+				if($(this).hasClass('expanded')){
+					$('.eca-table-discounts-content').slideToggle();
+					$('#eca-table-discounts-heading a').html('<i class="fa fa-expand" aria-hidden="true"></i> Show quantity discounts');
+					$(this).removeClass('expanded');
+				}
+				else {
+					$('.eca-table-discounts-content').slideToggle();
+					$('#eca-table-discounts-heading a').html('<i class="fa fa-expand" aria-hidden="true"></i> Hide quantity discounts');
+					$(this).addClass('expanded');
+				}
+			});
 		}
-		
-		$('#eca-table-discounts-heading').click(function(event){
-			event.preventDefault();
-			if($(this).hasClass('expanded')){
-				$('.eca-table-discounts-content').slideToggle();
-				$('#eca-table-discounts-heading a').html('<i class="fa fa-expand" aria-hidden="true"></i> Show quantity discounts');
-				$(this).removeClass('expanded');
-			}
-			else {
-				$('.eca-table-discounts-content').slideToggle();
-				$('#eca-table-discounts-heading a').html('<i class="fa fa-expand" aria-hidden="true"></i> Hide quantity discounts');
-				$(this).addClass('expanded');
-			}
-		});
-		
 	});
 
 })( jQuery );
