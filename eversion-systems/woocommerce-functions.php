@@ -253,9 +253,9 @@ function woo_custom_hide_sales_flash()
 *
 */
 
-function woocommerce_output_related_products() {
-	woocommerce_related_products(4,1); // Display 4 products in rows of 2
-}
+//function woocommerce_output_related_products() {
+	//woocommerce_related_products(4,1); // Display 4 products in rows of 2
+//}
 
 /**
 * Add a $30/$23 surcharge to your cart / checkout based on delivery country for memberships/subscriptions
