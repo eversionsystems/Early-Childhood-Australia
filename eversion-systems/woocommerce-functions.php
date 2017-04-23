@@ -997,7 +997,7 @@ function hide_shipping_when_free_is_available( $rates, $package ) {
 		}
 	}
  
-	if ( $count_pub41 >= 50 AND $only_pub41 ) {
+	if ( $count_pub41 >= 1 AND $only_pub41 ) {
 		//$rates['free_shipping'] = new WC_Shipping_Rate('free_shipping', 'Free Shipping', 0, array(), '');
 		unset( $rates['flat_rate'] );
 		unset( $rates['eca_shipping_express'] );
