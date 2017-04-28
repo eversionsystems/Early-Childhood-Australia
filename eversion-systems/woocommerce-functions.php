@@ -19,7 +19,7 @@ function eca_manage_woocommerce_styles(){
 	//$slug = get_post( $post )->post_name;
 
 	//if($slug == 'my-account'){
-	wp_enqueue_style('eca-woocommerce-custom', constant( 'EVERSION_PLUGIN_URL' ).'/woocommerce-custom.css', '', '1.01');
+	wp_enqueue_style('eca-woocommerce-custom', constant( 'EVERSION_PLUGIN_URL' ).'woocommerce-custom.css', '', '1.01');
 	//}
 }
 
@@ -1591,9 +1591,11 @@ add_action( 'woocommerce_product_quick_edit_end', 'es_display_custom_quickedit_p
  * @link	https://wpdreamer.com/2012/03/manage-wordpress-posts-using-bulk-edit-and-quick-edit/#populate_quick_edit
  */
 function es_save_custom_quickedit_product( $product ) {
-	if ( isset( $_REQUEST['member_price'] ) ) {
+	if ( isset( $_REQUEST['member_price'] ) AND ! empty( $_REQUEST['member_price'] ) ) {
 		update_post_meta( $product->id, 'member_price', wc_clean( $_REQUEST['member_price'] ) );
 	}
+	else 
+		delete_post_meta( $product->id, 'member_price' );
 }
 
 add_action( 'woocommerce_product_quick_edit_save', 'es_save_custom_quickedit_product' );
