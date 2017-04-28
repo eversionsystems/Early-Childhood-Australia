@@ -1398,8 +1398,9 @@ h1.entry-title {
 	width: auto;
 }
 #botm .woocommerce img {
-	max-height: 150px;
-	max-width: 102px;
+	/*max-height: 150px;
+	max-width: 102px;*/
+	width: 100% !important;
 }
 #botm h3,
 #botm .price,
@@ -2372,9 +2373,13 @@ div[itemprop="address"] {
 * Store Notice text
 */
 @media screen and ( min-width: 780px ) {
-	#eca-page {
+	/**
+	 * TO DO: If store wide text used we need to activate this CSS below.
+	 * When I can access test again I will fix this by using PHP to cehck if store wide text banner is enabled.
+	 */
+	/*#eca-page {
 		margin-top:40px !important;
-	}
+	}*/
 	.admin-bar p.demo_store {
 		top: 32px;
 	}

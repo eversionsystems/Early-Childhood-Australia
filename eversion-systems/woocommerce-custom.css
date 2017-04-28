@@ -10,7 +10,7 @@
 
 /* Main shop loop products */
 .woocommerce ul.products li.product a img, .woocommerce-page ul.products li.product a img {
-    /*width: 75% !important;*/
+    width: 75% !important;
 	width:auto; 
 	height: auto;
 }
