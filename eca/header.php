@@ -215,58 +215,6 @@ jQuery(document).ready(function() {
 	*/
 });
 
-/**
- * Google Custom search engine
- * 
- * @since ECA 1.0 
- */
-function parseParamsFromUrl() {	
-	var params = {};
-	var parts = window.location.search.substr(1).split('\x26');	
-	for (var i = 0; i < parts.length; i++) {
-		var keyValuePair = parts[i].split('=');
-		var key = decodeURIComponent(keyValuePair[0]);
-		params[key] = keyValuePair[1] ? decodeURIComponent(keyValuePair[1].replace(/\+/g, ' ')) : keyValuePair[1];
-	}
-	return params;
-}
-function gcseCallback() {
-	if (document.readyState != 'complete') {
-		return google.setOnLoadCallback(gcseCallback, true);
-	}
-	google.search.cse.element.render({
-		gname: 'gsrch',
- 		div: 'results',
- 		tag: 'searchresults-only',
- 		attributes: {
-			linkTarget: ''
-		}
-	});
-	var urlParams = parseParamsFromUrl();
-	var element = google.search.cse.element.getElement('gsrch');
-	var queryParamName = "search";
-	if (urlParams[queryParamName]) {
-		element.execute(urlParams[queryParamName]);	
-	}
-}
-
-//function initGoogle() {
-	window.__gcse = {
-		parsetags: 'explicit',
-		callback: gcseCallback
-	};
-//}
-
-(function() {
-	var cx = '011188576967674765517:uyc3tuh6xtq';
-	var gcse = document.createElement('script');
-	gcse.type = 'text/javascript';
-	gcse.async = true;
-	gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//www.google.com/cse/cse.js?cx=' + cx;
-	var s = document.getElementsByTagName('script')[0];
-	s.parentNode.insertBefore(gcse, s);
-})();
-
 /** {{{
 * jQuery.ScrollTo - Easy element scrolling using jQuery.
 * Copyright (c) 2007-2013 Ariel Flesler - aflesler<a>gmail<d>com | http://flesler.blogspot.com
@@ -324,10 +272,7 @@ jQuery( function( $ ) {
 	<div id="eca-page-container">
 		
 		<?php 
-		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-		$woocommerce_active = is_plugin_active('woocommerce/woocommerce.php');
-		
-		if($woocommerce_active) {
+		if ( class_exists( 'woocommerce' ) ) {
 			if (get_option( 'woocommerce_demo_store' ) == 'yes') { ?>
 			<header id="eca-header" class="site-header site-header-woo-notice-text" role="banner">
 			<?php 
@@ -367,17 +312,19 @@ jQuery( function( $ ) {
 			
 			<div id="eca-header-banner" class="content">
 				<div id="eca-header-logo">
-					<a href="http://www.earlychildhoodaustralia.org.au/shop/" rel="home">
+					<a href="<?php echo site_url(); ?>" rel="home">
 						<img src="<?php echo get_template_directory_uri(); ?>/images/eca-shop-logo-561x85px.png" width="561" height="85" alt="" />
 					</a>
 				</div><!-- #eca-header-logo -->
 				
 				<div id="eca-header-tools">
 					<div id="eca-header-search">
-						<form method="get" action="<?php echo home_url('/search-results/');?>">
-							<input type="text" id="search" name="search" class="ui-corner-all" />
-							<button type="submit">Search</button>
-						</form>
+						<?php 
+						if ( class_exists( 'woocommerce' ) )
+							get_product_search_form();
+						else
+							get_search_form(); 
+						?>
 					</div><!-- #eca-header-search -->
 					<div id="eca-header-buttons">
 					<?php 

@@ -2401,3 +2401,10 @@ p.demo_store {
 	color:#FFF !important;
 	background-color:#c44e1a !important;
 }
+
+/**
+ * WooCommerce search button
+ */
+.ui-button-icon-only .ui-button-text {
+	padding: .2em !important;
+}

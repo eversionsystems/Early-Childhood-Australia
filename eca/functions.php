@@ -225,3 +225,118 @@ function woocommerce_header_add_to_cart_fragment( $fragments ) {
 	
 	return $fragments;
 }
+
+/**
+ * Modify the search form for WooCommcerce.
+ *
+ * Change markup.
+ *
+ * @link	http://www.remicorson.com/customize-woocommerce-products-search-form/
+ * @return 	string HTML form.
+ */
+function eca_modify_woocommerce_search_form( $form ) {
+	
+	$form = '<form role="search" method="get" class="woocommerce-product-search" action="' . esc_url( home_url( '/'  ) ) . '">
+	<input type="search" class="search-field ui-corner-all" placeholder="' . esc_attr_x( 'Search Products&hellip;', 'placeholder', 'woocommerce' ) . '" value="' . get_search_query() . '" name="s" title="' . esc_attr_x( 'Search for:', 'label', 'woocommerce' ) . '" />
+	<button type="submit" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" role="button" aria-disabled="false" title="Search">
+	<span class="ui-button-icon-primary ui-icon ui-icon-search"></span><span class="ui-button-text">Search</span></button>
+	<input type="hidden" name="post_type" value="product" />
+	</form>';
+	
+	return $form;
+}
+
+add_filter( 'get_product_search_form', 'eca_modify_woocommerce_search_form', 10, 1 );
+
+/**
+ * Return SVG markup.
+ *
+ * @param array $args {
+ *     Parameters needed to display an SVG.
+ *
+ *     @type string $icon  Required SVG icon filename.
+ *     @type string $title Optional SVG title.
+ *     @type string $desc  Optional SVG description.
+ * }
+ * @return string SVG markup.
+ */
+function eca_get_svg( $args = array() ) {
+	// Make sure $args are an array.
+	if ( empty( $args ) ) {
+		return __( 'Please define default parameters in the form of an array.', 'twentyseventeen' );
+	}
+
+	// Define an icon.
+	if ( false === array_key_exists( 'icon', $args ) ) {
+		return __( 'Please define an SVG icon filename.', 'twentyseventeen' );
+	}
+
+	// Set defaults.
+	$defaults = array(
+		'icon'        => '',
+		'title'       => '',
+		'desc'        => '',
+		'fallback'    => false,
+	);
+
+	// Parse args.
+	$args = wp_parse_args( $args, $defaults );
+
+	// Set aria hidden.
+	$aria_hidden = ' aria-hidden="true"';
+
+	// Set ARIA.
+	$aria_labelledby = '';
+
+	/*
+	 * Twenty Seventeen doesn't use the SVG title or description attributes; non-decorative icons are described with .screen-reader-text.
+	 *
+	 * However, child themes can use the title and description to add information to non-decorative SVG icons to improve accessibility.
+	 *
+	 * Example 1 with title: <?php echo twentyseventeen_get_svg( array( 'icon' => 'arrow-right', 'title' => __( 'This is the title', 'textdomain' ) ) ); ?>
+	 *
+	 * Example 2 with title and description: <?php echo twentyseventeen_get_svg( array( 'icon' => 'arrow-right', 'title' => __( 'This is the title', 'textdomain' ), 'desc' => __( 'This is the description', 'textdomain' ) ) ); ?>
+	 *
+	 * See https://www.paciellogroup.com/blog/2013/12/using-aria-enhance-svg-accessibility/.
+	 */
+	if ( $args['title'] ) {
+		$aria_hidden     = '';
+		$unique_id       = uniqid();
+		$aria_labelledby = ' aria-labelledby="title-' . $unique_id . '"';
+
+		if ( $args['desc'] ) {
+			$aria_labelledby = ' aria-labelledby="title-' . $unique_id . ' desc-' . $unique_id . '"';
+		}
+	}
+
+	// Begin SVG markup.
+	$svg = '<svg class="icon icon-' . esc_attr( $args['icon'] ) . '"' . $aria_hidden . $aria_labelledby . ' role="img">';
+
+	// Display the title.
+	if ( $args['title'] ) {
+		$svg .= '<title id="title-' . $unique_id . '">' . esc_html( $args['title'] ) . '</title>';
+
+		// Display the desc only if the title is already set.
+		if ( $args['desc'] ) {
+			$svg .= '<desc id="desc-' . $unique_id . '">' . esc_html( $args['desc'] ) . '</desc>';
+		}
+	}
+
+	/*
+	 * Display the icon.
+	 *
+	 * The whitespace around `<use>` is intentional - it is a work around to a keyboard navigation bug in Safari 10.
+	 *
+	 * See https://core.trac.wordpress.org/ticket/38387.
+	 */
+	$svg .= ' <use href="#icon-' . esc_html( $args['icon'] ) . '" xlink:href="#icon-' . esc_html( $args['icon'] ) . '"></use> ';
+
+	// Add some markup to use as a fallback for browsers that do not support SVGs.
+	if ( $args['fallback'] ) {
+		$svg .= '<span class="svg-fallback icon-' . esc_attr( $args['icon'] ) . '"></span>';
+	}
+
+	$svg .= '</svg>';
+
+	return $svg;
+}
