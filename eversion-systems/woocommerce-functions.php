@@ -1629,4 +1629,25 @@ function es_populating_custom_product_columns( $column_name, $post_id ) {
 
 add_action( 'manage_product_posts_custom_column', 'es_populating_custom_product_columns', 10, 2 );
 
+/**
+ * Sorting logic of products.
+ *
+ * Add custom sorting dependent on the category the user is browsing.
+ *
+ * @since	1.0.0
+ * @return	array
+ */
+function es_change_default_category_orderby( $order_by ) {
+	global $wp_query;
+	$cat_id = $wp_query->get_queried_object()->term_id;
+
+	// Category id E-learning Subscriptions is 190
+	if ( $cat_id == 190 )
+		return 'price';
+	else
+		return $order_by;
+}
+
+add_filter( 'woocommerce_default_catalog_orderby', 'es_change_default_category_orderby' );
+
 ?>
